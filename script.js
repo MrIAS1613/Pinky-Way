@@ -18,10 +18,11 @@ function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   grid.innerHTML = "";
   members.forEach(m => {
-    const links = [];
-    if (m.links?.github) links.push(`<a href="${m.links.github}" target="_blank">GitHub</a>`);
-    if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank">Portfolio</a>`);
-    if (m.links?.x) links.push(`<a href="${m.links.x}" target="_blank">X</a>`);
+const links = [];
+if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank">Portfolio</a>`);
+if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank">Facebook</a>`);
+if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank">Instagram</a>`);
+if (m.links?.email) links.push(`<a href="mailto:${m.links.email}">Email</a>`);
 
     grid.appendChild(el(`
       <article class="item">
