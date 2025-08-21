@@ -50,7 +50,7 @@ if (m.links?.email) {
           </div>
         </div>
         <p style="margin-top:10px">${m.bio ?? ""}</p>
-        <div>${links.join(" · ")}</div>
+        <div class="social-links">${links.join("")}</div>
         ${m.tags?.length ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
     `));
@@ -87,9 +87,6 @@ function renderSummaries(summaries) {
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
   const members = await loadJSON("/data/members.json");
-  const projects = await loadJSON("/data/projects.json");
-  const summaries = await loadJSON("/data/summaries.json");
+  
   renderMembers(members);
-  renderProjects(projects);
-  renderSummaries(summaries);
 })();
