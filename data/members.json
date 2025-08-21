@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Queen Pookie",
+    "role": "Founder",
+    "bio": "Keeps the vibes clean and the guiding to make biggest pookie community of Bangladesh.",
+    "links": { "github": "https://github.com/", "x": "https://x.com/" },
+    "tags": ["Organizer","Docs"],
+    "avatar": "/public/avatar1.png"
+  },
+  {
+    "name": "Admin Pookie 1",
+    "role": "Developer",
+    "bio": "Builds cool stuff and memes responsibly.",
+    "links": { "github": "https://mrias1613.github.io/" },
+    "tags": ["Frontend"]
+  }
+]
