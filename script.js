@@ -17,40 +17,36 @@ function el(html) {
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   grid.innerHTML = "";
+  if (!members || members.length === 0) {
+    grid.innerHTML = "<p>No members yet! Join us!</p>";
+    return;
+  }
   members.forEach(m => {
-const links = [];
-if (m.links?.portfolio) {
-  links.push(`<a href="${m.links.portfolio}" target="_blank">
-    <i class="fa-solid fa-globe"></i>
-  </a>`);
-}
-if (m.links?.facebook) {
-  links.push(`<a href="${m.links.facebook}" target="_blank">
-    <i class="fa-brands fa-facebook"></i>
-  </a>`);
-}
-if (m.links?.instagram) {
-  links.push(`<a href="${m.links.instagram}" target="_blank">
-    <i class="fa-brands fa-instagram"></i>
-  </a>`);
-}
-if (m.links?.email) {
-  links.push(`<a href="mailto:${m.links.email}" target="_blank">
-    <i class="fa-solid fa-envelope"></i>
-  </a>`);
-}
+    const links = [];
+    if (m.links?.Portfolio) {
+      links.push(`<a href="${m.links.Portfolio}" target="_blank" class="link-icon"><i class="fa-solid fa-globe"></i></a>`);
+    }
+    if (m.links?.Facebook) {
+      links.push(`<a href="${m.links.Facebook}" target="_blank" class="link-icon"><i class="fa-brands fa-facebook"></i></a>`);
+    }
+    if (m.links?.Instagram) {
+      links.push(`<a href="${m.links.Instagram}" target="_blank" class="link-icon"><i class="fa-brands fa-instagram"></i></a>`);
+    }
+    if (m.links?.email) {
+      links.push(`<a href="mailto:${m.links.email}" target="_blank" class="link-icon"><i class="fa-solid fa-envelope"></i></a>`);
+    }
 
     grid.appendChild(el(`
       <article class="item">
         <div class="row">
           ${m.avatar ? `<img class="avatar" src="${m.avatar}" alt="${m.name}">` : ""}
           <div>
-            <h3>${m.name}</h3>
+            <h3>${m.name || "Unknown"}</h3>
             <p>${m.role ?? "Member"}</p>
           </div>
         </div>
         <p style="margin-top:10px">${m.bio ?? ""}</p>
-        <div class="social-links">${links.join("")}</div>
+        <div class="link-icons">${links.join("")}</div>
         ${m.tags?.length ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
     `));
@@ -86,7 +82,7 @@ function renderSummaries(summaries) {
 
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
-  const members = await loadJSON("/data/members.json");
-  
+  const members = await loadJSON("./data/members.json");
   renderMembers(members);
+  
 })();
