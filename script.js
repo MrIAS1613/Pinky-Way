@@ -23,18 +23,10 @@ function renderMembers(members) {
   }
   members.forEach(m => {
     const links = [];
-    if (m.links?.Portfolio) {
-      links.push(`<a href="${m.links.Portfolio}" target="_blank" class="link-icon"><i class="fa-solid fa-globe"></i></a>`);
-    }
-    if (m.links?.Facebook) {
-      links.push(`<a href="${m.links.Facebook}" target="_blank" class="link-icon"><i class="fa-brands fa-facebook"></i></a>`);
-    }
-    if (m.links?.Instagram) {
-      links.push(`<a href="${m.links.Instagram}" target="_blank" class="link-icon"><i class="fa-brands fa-instagram"></i></a>`);
-    }
-    if (m.links?.email) {
-      links.push(`<a href="mailto:${m.links.email}" target="_blank" class="link-icon"><i class="fa-solid fa-envelope"></i></a>`);
-    }
+if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank">Portfolio</a>`);
+if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank">Facebook</a>`);
+if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank">Instagram</a>`);
+if (m.links?.email) links.push(`<a href="mailto:${m.links.email}">Email</a>`);
 
     grid.appendChild(el(`
       <article class="item">
