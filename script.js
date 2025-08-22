@@ -14,11 +14,12 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-function renderMembers(admins) {
+function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
   grid.innerHTML = "";
-  admins.forEach(m => {
+
+  members.forEach(m => {
     const links = [];
 
     if (m.links?.portfolio) {
@@ -70,10 +71,12 @@ function renderMembers(admins) {
   });
 }
 
+
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const admins = await loadJSON("/data/admins.json");
 
-  renderMembers(admins);
+  const members = await loadJSON("/data/members.json");
+  
+  renderMembers(members);
 })();
