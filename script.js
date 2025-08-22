@@ -45,7 +45,7 @@ function renderMembers(members) {
 }
 
 function renderPookies(pookies) {
-  const grid = document.getElementById("pookies-grid"); // members-grid না, আলাদা div হলে better
+  const grid = document.getElementById("pookies-grid");
   if (!grid) return;
   grid.innerHTML = "";
 
