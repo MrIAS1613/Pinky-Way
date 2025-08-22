@@ -9,14 +9,14 @@ async function loadJSON(path) {
   }
 }
 
-// Helper to create element from HTML string
+// Create element from HTML string
 function el(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
 
-// Render Admins (members.json)
+// Render Admins
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -24,7 +24,6 @@ function renderMembers(members) {
 
   members.forEach(m => {
     const links = [];
-
     if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
     if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
@@ -41,13 +40,13 @@ function renderMembers(members) {
         </div>
         ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${m.tag ? `<div class="badge">${m.tag}</div>` : ""}
+        ${m.tags?.length && m.tags[0] !== "" ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
     `));
   });
 }
 
-// Render Members (pookies.json)
+// Render Pookies
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -55,14 +54,13 @@ function renderPookies(pookies) {
 
   pookies.forEach(p => {
     const links = [];
-
     if (p.links?.portfolio) links.push(`<a href="${p.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
     if (p.links?.facebook) links.push(`<a href="${p.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (p.links?.instagram) links.push(`<a href="${p.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
     if (p.links?.email) links.push(`<a href="mailto:${p.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
     grid.appendChild(el(`
-      <article class="item normal-card">
+      <article class="item pookie-card">
         <div class="row">
           ${p.avatar ? `<img class="avatar" src="${p.avatar}" alt="${p.name}">` : ""}
           <div>
@@ -72,7 +70,7 @@ function renderPookies(pookies) {
         </div>
         ${p.bio ? `<p style="margin-top:10px">${p.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${p.tag ? `<div class="badge">${p.tag}</div>` : ""}
+        ${p.tags?.length && p.tags[0] !== "" ? `<div class="badge pookie-badge">${p.tags.join(" • ")}</div>` : ""}
       </article>
     `));
   });
@@ -80,14 +78,11 @@ function renderPookies(pookies) {
 
 // Initialize
 (async () => {
-  // Update footer year
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // Load admins
   const members = await loadJSON("/data/members.json");
   renderMembers(members);
 
-  // Load pookies
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 })();
