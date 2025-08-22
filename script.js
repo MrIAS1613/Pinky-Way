@@ -16,65 +16,65 @@ function el(html) {
 
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
+  if (!grid) return;
   grid.innerHTML = "";
-  if (!members || members.length === 0) {
-    grid.innerHTML = "<p>No members yet! Join us!</p>";
-    return;
-  }
+
   members.forEach(m => {
     const links = [];
-if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank">Portfolio</a>`);
-if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank">Facebook</a>`);
-if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank">Instagram</a>`);
-if (m.links?.email) links.push(`<a href="mailto:${m.links.email}">Email</a>`);
+
+    if (m.links?.portfolio) {
+      links.push(`
+        <a href="${m.links.portfolio}" target="_blank" rel="noreferrer">
+          <i class="fa-solid fa-globe"></i>
+        </a>
+      `);
+    }
+    if (m.links?.facebook) {
+      links.push(`
+        <a href="${m.links.facebook}" target="_blank" rel="noreferrer">
+          <i class="fa-brands fa-facebook"></i>
+        </a>
+      `);
+    }
+    if (m.links?.instagram) {
+      links.push(`
+        <a href="${m.links.instagram}" target="_blank" rel="noreferrer">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+      `);
+    }
+    if (m.links?.email) {
+      links.push(`
+        <a href="mailto:${m.links.email}">
+          <i class="fa-solid fa-envelope"></i>
+        </a>
+      `);
+    }
 
     grid.appendChild(el(`
       <article class="item">
         <div class="row">
           ${m.avatar ? `<img class="avatar" src="${m.avatar}" alt="${m.name}">` : ""}
           <div>
-            <h3>${m.name || "Unknown"}</h3>
+            <h3>${m.name}</h3>
             <p>${m.role ?? "Member"}</p>
           </div>
         </div>
-        <p style="margin-top:10px">${m.bio ?? ""}</p>
-        <div class="link-icons">${links.join("")}</div>
+
+        ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
+
+        ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
+
         ${m.tags?.length ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
     `));
   });
 }
 
-function renderProjects(projects) {
-  const grid = document.getElementById("projects-grid");
-  grid.innerHTML = "";
-  projects.forEach(p => {
-    grid.appendChild(el(`
-      <article class="item">
-        <h3>${p.title}</h3>
-        <p>${p.description ?? ""}</p>
-        ${p.link ? `<a href="${p.link}" target="_blank" rel="noreferrer">View</a>` : ""}
-      </article>
-    `));
-  });
-}
-
-function renderSummaries(summaries) {
-  const list = document.getElementById("summaries-list");
-  list.innerHTML = "";
-  summaries.forEach(s => {
-    list.appendChild(el(`
-      <li>
-        <strong>${s.title}</strong> — ${s.period}
-        ${s.link ? ` · <a href="${s.link}" target="_blank" rel="noreferrer">Open</a>` : ""}
-      </li>
-    `));
-  });
-}
-
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
-  const members = await loadJSON("./data/members.json");
+
+  const members = await loadJSON("/data/members.json");
+
   renderMembers(members);
-  
 })();
