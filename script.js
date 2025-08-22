@@ -8,14 +8,12 @@ async function loadJSON(path) {
   }
 }
 
-// Create element from HTML string
 function el(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
 
-// Render Admins
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -45,7 +43,6 @@ function renderMembers(members) {
   });
 }
 
-// Render Pookies
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -75,13 +72,12 @@ function renderPookies(pookies) {
   });
 }
 
-// Initialize
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const members = await loadJSON("/data/members.json"); // Admins
+  const members = await loadJSON("/data/members.json");
   renderMembers(members);
 
-  const pookies = await loadJSON("/data/pookies.json"); // Pookies
+  const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 })();
