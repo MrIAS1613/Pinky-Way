@@ -14,7 +14,7 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-function renderMembers(admins) {
+function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
   grid.innerHTML = "";
