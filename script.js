@@ -14,6 +14,11 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
+function renderMembers(admins) {
+  const grid = document.getElementById("members-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  
 fetch("data/admins.json")
   .then(res => res.json())
   .then(admins => {
@@ -29,6 +34,11 @@ fetch("data/admins.json")
     });
   });
 
+  function renderMembers(members) {
+  const grid = document.getElementById("members-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+    
 fetch("data/members.json")
   .then(res => res.json())
   .then(members => {
