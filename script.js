@@ -19,6 +19,11 @@ function renderMembers(members) {
   if (!grid) return;
   grid.innerHTML = "";
 
+  function renderPookies(pookies) {
+  const grid = document.getElementById("members-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
   members.forEach(m => {
     const links = [];
 
@@ -79,4 +84,8 @@ function renderMembers(members) {
   const members = await loadJSON("/data/members.json");
   
   renderMembers(members);
+
+  const pookies = await loadJSON("/data/pookies.json");
+  
+  renderPookies(pookies);
 })();
