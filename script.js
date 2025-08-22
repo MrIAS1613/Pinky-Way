@@ -73,7 +73,7 @@ function renderMembers(admins) {
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const members = await loadJSON("/data/admins.json");
+  const admins = await loadJSON("/data/admins.json");
 
   renderMembers(admins);
 })();
