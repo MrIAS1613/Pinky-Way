@@ -1,3 +1,4 @@
+// Load JSON safely
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
@@ -8,12 +9,14 @@ async function loadJSON(path) {
   }
 }
 
+// Helper to create element from HTML string
 function el(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
 
+// Render Admins (members.json)
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -28,22 +31,23 @@ function renderMembers(members) {
     if (m.links?.email) links.push(`<a href="mailto:${m.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
     grid.appendChild(el(`
-      <article class="item">
+      <article class="item admin-card">
         <div class="row">
           ${m.avatar ? `<img class="avatar" src="${m.avatar}" alt="${m.name}">` : ""}
           <div>
             <h3>${m.name}</h3>
-            <p>${m.role ?? "Member"}</p>
+            <p>${m.role ?? "Admin"}</p>
           </div>
         </div>
         ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${m.tags?.length ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
+        ${m.tag ? `<div class="badge">${m.tag}</div>` : ""}
       </article>
     `));
   });
 }
 
+// Render Members (pookies.json)
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -51,13 +55,14 @@ function renderPookies(pookies) {
 
   pookies.forEach(p => {
     const links = [];
+
     if (p.links?.portfolio) links.push(`<a href="${p.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
     if (p.links?.facebook) links.push(`<a href="${p.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (p.links?.instagram) links.push(`<a href="${p.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
     if (p.links?.email) links.push(`<a href="mailto:${p.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
     grid.appendChild(el(`
-      <article class="item">
+      <article class="item normal-card">
         <div class="row">
           ${p.avatar ? `<img class="avatar" src="${p.avatar}" alt="${p.name}">` : ""}
           <div>
@@ -67,18 +72,22 @@ function renderPookies(pookies) {
         </div>
         ${p.bio ? `<p style="margin-top:10px">${p.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${p.tags?.length ? `<div class="badge">${p.tags.join(" • ")}</div>` : ""}
+        ${p.tag ? `<div class="badge">${p.tag}</div>` : ""}
       </article>
     `));
   });
 }
 
+// Initialize
 (async () => {
+  // Update footer year
   document.getElementById("year").textContent = new Date().getFullYear();
 
+  // Load admins
   const members = await loadJSON("/data/members.json");
   renderMembers(members);
 
+  // Load pookies
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 })();
