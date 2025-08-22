@@ -8,9 +8,13 @@
   --ring:#ffd1e0;
   --border:#f1d6e0;
   --shadow: 0 10px 30px rgba(255,128,171,.15);
+
+  /* Pookie specific colors */
+  --pookie-badge:#fddde6;
+  --pookie-border:#f9c5d1;
 }
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;}
 body{
   margin:0;
   font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
@@ -21,11 +25,11 @@ body{
     var(--bg);
 }
 
-.shell{max-width:1040px;margin:0 auto;padding:16px}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.brand{font-family:Poppins,Inter,sans-serif;font-weight:800;letter-spacing:.3px;text-decoration:none;color:var(--text)}
-.links a{color:var(--muted);text-decoration:none;margin-left:14px}
-.links a:hover{color:var(--text)}
+.shell{max-width:1040px;margin:0 auto;padding:16px;}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
+.brand{font-family:Poppins,Inter,sans-serif;font-weight:800;letter-spacing:.3px;text-decoration:none;color:var(--text);}
+.links a{color:var(--muted);text-decoration:none;margin-left:14px;}
+.links a:hover{color:var(--text);}
 
 .hero{
   padding:72px 18px;
@@ -35,58 +39,47 @@ body{
   border:1px solid var(--border);
   box-shadow: var(--shadow);
 }
-.hero h1{font-family:Poppins,Inter,sans-serif;font-size:40px;margin:0 0 12px;letter-spacing:.2px}
-.sub{color:var(--muted);margin:0 0 24px}
-.cta{
-  display:inline-block;background:var(--accent);color:#fff;
-  padding:11px 18px;border-radius:14px;text-decoration:none;font-weight:700;
-  box-shadow:0 6px 20px rgba(255,128,171,.35);
-}
-.cta:hover{transform:translateY(-1px)}
-h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif}
-
+.hero h1{font-family:Poppins,Inter,sans-serif;font-size:40px;margin:0 0 12px;letter-spacing:.2px;}
+.sub{color:var(--muted);margin:0 0 24px;}
+h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif;}
 .card{
-  background:var(--card);padding:18px;border-radius:18px;border:1px solid var(--border);
+  background:var(--card);
+  padding:18px;
+  border-radius:18px;
+  border:1px solid var(--border);
   box-shadow: var(--shadow);
 }
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:10px;}
 .item{
-  background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
   transition:transform .12s ease, box-shadow .12s ease,border-color .12s ease;
 }
-.item:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--ring)}
-.item h3{margin:0 0 6px;font-size:18px}
-.item p{margin:0;color:var(--muted);font-size:14px}
-.item a{color:var(--accent);text-decoration:none;font-weight:600;font-size:14px}
-.badge{display:inline-block;font-size:12px;color:#5b2240;background:var(--accent-2);padding:4px 8px;border-radius:999px;margin-top:8px}
+.item:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--ring);}
+.item h3{margin:0 0 6px;font-size:18px;}
+.item p{margin:0;color:var(--muted);font-size:14px;}
+.item a{color:var(--accent);text-decoration:none;font-weight:600;font-size:14px;}
+.badge{display:inline-block;font-size:12px;color:#5b2240;background:var(--accent-2);padding:4px 8px;border-radius:999px;margin-top:8px;}
 
 .avatar{
   width:44px;height:44px;border-radius:999px;object-fit:cover;margin-right:10px;border:2px solid var(--ring);
   background:#ffe9f1;
 }
-.row{display:flex;align-items:center}
+.row{display:flex;align-items:center;}
 
-.list{list-style:none;padding:0;margin:10px 0 0}
-.list li{
-  background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:10px
-}
-.list a{color:var(--accent);text-decoration:none}
-
-.foot{display:flex;align-items:center;justify-content:space-between;color:var(--muted);padding:24px 16px}
-.socials a{color:var(--muted);text-decoration:none;margin-left:14px}
-.socials a:hover{color:var(--text)}
+.foot{display:flex;align-items:center;justify-content:space-between;color:var(--muted);padding:24px 16px;}
+.socials a{color:var(--muted);text-decoration:none;margin-left:14px;}
+.socials a:hover{color:var(--text);}
 
 @media (max-width:640px){
-  .links{display:none}
-  .hero h1{font-size:32px}
-   }
-.link-icons {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
+  .links{display:none;}
+  .hero h1{font-size:32px;}
 }
 
+/* Social links */
 .social-links a {
   margin: 0 6px;
   font-size: 18px;          
@@ -95,23 +88,16 @@ h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif}
   text-decoration: none;
   vertical-align: middle;
 }
+.social-links a:hover { color: #ff1493; transform: translateY(-1px); }
+.item .social-links { margin-top: 10px; }
 
-.social-links a:hover {
-  color: #ff1493;           
-  transform: translateY(-1px);
-}
+/* Admin & Pookie distinction */
+.admin-card { border: 2px solid var(--accent); }
+.pookie-card { border: 2px solid var(--pookie-border); }
+.pookie-badge { background: var(--pookie-badge); }
 
-.item .social-links {
-  margin-top: 10px;
-}
-
-.member-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.member-card {
+/* Optional extra hover effect for pookies */
+.pookie-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,192,203,0.3); }.member-card {
   background: #111;
   padding: 15px;
   border-radius: 10px;
