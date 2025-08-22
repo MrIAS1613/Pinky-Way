@@ -1,4 +1,3 @@
-// Load JSON safely
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
@@ -80,9 +79,9 @@ function renderPookies(pookies) {
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const members = await loadJSON("/data/members.json");
+  const members = await loadJSON("/data/members.json"); // Admins
   renderMembers(members);
 
-  const pookies = await loadJSON("/data/pookies.json");
+  const pookies = await loadJSON("/data/pookies.json"); // Pookies
   renderPookies(pookies);
 })();
