@@ -18,42 +18,6 @@ function renderMembers(admins) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
   grid.innerHTML = "";
-  
-fetch("data/admins.json")
-  .then(res => res.json())
-  .then(admins => {
-    const adminList = document.getElementById("admin-list");
-    admins.forEach(admin => {
-      const card = document.createElement("div");
-      card.className = "member-card admin-card";
-      card.innerHTML = `
-        <h3>${admin.name}</h3>
-        <p>${admin.role}</p>
-      `;
-      adminList.appendChild(card);
-    });
-  });
-
-  function renderMembers(members) {
-  const grid = document.getElementById("members-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
-    
-fetch("data/members.json")
-  .then(res => res.json())
-  .then(members => {
-    const memberList = document.getElementById("member-list");
-    members.forEach(member => {
-      const card = document.createElement("div");
-      card.className = "member-card normal-card";
-      card.innerHTML = `
-        <h3>${member.name}</h3>
-        <p>${member.role}</p>
-      `;
-      memberList.appendChild(card);
-    });
-  });
-
   members.forEach(m => {
     const links = [];
 
