@@ -14,11 +14,11 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-function renderMembers(members) {
+function renderMembers(admins) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
   grid.innerHTML = "";
-  members.forEach(m => {
+  admins.forEach(m => {
     const links = [];
 
     if (m.links?.portfolio) {
@@ -73,7 +73,7 @@ function renderMembers(members) {
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const members = await loadJSON("/data/members.json");
+  const members = await loadJSON("/data/admins.json");
 
-  renderMembers(members);
+  renderMembers(admins);
 })();
