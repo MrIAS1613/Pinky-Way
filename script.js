@@ -40,7 +40,7 @@ function renderMembers(members) {
         </div>
         ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${m.tag && m.tag !== "" ? `<div class="badge">${m.tag}</div>` : ""}
+        ${m.tags?.length && m.tags[0] !== "" ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
     `));
   });
@@ -70,25 +70,21 @@ function renderPookies(pookies) {
         </div>
         ${p.bio ? `<p style="margin-top:10px">${p.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${p.tag && p.tag !== "" ? `<div class="badge pookie-badge">${p.tag}</div>` : ""}
+        ${p.tags?.length && p.tags[0] !== "" ? `<div class="badge pookie-badge">${p.tags.join(" • ")}</div>` : ""}
       </article>
     `));
   });
 }
 
-// Show Total Members
-async function getCount() {
+// Update Total Pookies
+async function updatePookieCount() {
   try {
-    const membersData = await loadJSON("/data/members.json");
-    const pookiesData = await loadJSON("/data/pookies.json");
-    const total = membersData.length + pookiesData.length;
-
-    const totalEl = document.getElementById("totalCount");
-    if (totalEl) totalEl.textContent = total;
+    const pookiesRes = await fetch("/data/pookies.json", { cache: "no-store" });
+    const pookiesData = await pookiesRes.json();
+    document.getElementById("totalCount").textContent = pookiesData.length;
   } catch (err) {
-    console.error("Count load error:", err);
-    const totalEl = document.getElementById("totalCount");
-    if (totalEl) totalEl.textContent = "Error";
+    console.error("Error loading pookies count:", err);
+    document.getElementById("totalCount").textContent = "Error";
   }
 }
 
@@ -102,6 +98,5 @@ async function getCount() {
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 
-  // Total Members
-  getCount();
+  updatePookieCount(); // Show total pookies
 })();
