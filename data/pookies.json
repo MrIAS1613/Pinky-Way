@@ -1,14 +1,14 @@
 [
   { "name": "Anika Sultana Adhora", "role": "Member", "tags": ["Loyal"] },
   { "name": "Ay'Ee Riy'Oo (Rima)", "role": "Member", "tags": ["Footballer"] },
-  { "name": "Badhan Paul", "role": "Member", "tags": [] },
+  { "name": "Badhan Paul", "role": "Member", "tags": ["Beshi pakna"] },
   { "name": "Faiza Fardina (Ananna)", "role": "Member", "tags": ["Detective"] },
   { "name": "Israt Alvi", "role": "Member", "tags": ["Inactive"] },
   { "name": "Itz Ahona (Shreya)", "role": "Member", "tags": ["White eyes"] },
   { "name": "Kaniz Fatema Nishat", "role": "Member", "tags": ["Haha emoji"] },
   { "name": "Kha Diza", "role": "Member", "tags": ["Telapoka lover"] },
   { "name": "Khadiza Islam Fima", "role": "Member", "tags": ["Most junior"] },
-  { "name": "Khadiza Vibes (Meghla)", "role": "Member", "tags": ["Innocent baccha"] },
+  { "name": "Khadiza Vibes (Meghla)", "role": "Member", "tags": ["Sob dosh er vagidar"] },
   { "name": "Laiya Binte", "role": "Member", "tags": ["Not visible but sweet"] },
   { "name": "Limon Sarkar", "role": "Member", "tags": ["Big fan guy"] },
   { "name": "Logna Biswas", "role": "Member", "tags": ["Sohomot bhai"] },
@@ -23,8 +23,8 @@
   { "name": "Rifat Kazi", "role": "Member", "tags": [] },
   { "name": "Rita Rahman (Roshni)", "role": "Member", "tags": ["Gomvir"] },
   { "name": "Samira (Ontora)", "role": "Member", "tags": ["Voice artist"] },
-  { "name": "Sadika Rashid", "role": "Member", "tags": [] },
-  { "name": "Sanjida Akther Lamiya", "role": "Member", "tags": ["Innocent baccha 2.0"] },
+  { "name": "Sadika Rashid", "role": "Member", "tags": ["TikToker"] },
+  { "name": "Sanjida Akther Lamiya", "role": "Member", "tags": ["Innocent baccha"] },
   { "name": "Sayem Hossain", "role": "Member", "tags": ["Playboy"] },
   { "name": "Sayem Tahmid (SAM)", "role": "Member", "tags": ["Khamba"] },
   { "name": "Shadman Hasan", "role": "Member", "tags": ["eSports player"] },
@@ -32,5 +32,5 @@
   { "name": "Sheikh Shimanto", "role": "Member", "tags": ["Politician"] },
   { "name": "Tahsan Ahmed", "role": "Member", "tags": ["Mood swinger"] },
   { "name": "Tasnim S.", "role": "Member", "tags": ["Strict but sweet"] },
-  { "name": "Wasiful Haq", "role": "Member", "tags": ["Khamba 2.0"] }
+  { "name": "Wasiful Haq", "role": "Member", "tags": ["Cool boy"] }
 ]
