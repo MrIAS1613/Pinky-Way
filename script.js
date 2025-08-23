@@ -75,18 +75,18 @@ function renderPookies(pookies) {
 async function getCount() {
   let total = 0;
 
-  const membersRes = await fetch("members.json");
+  // members.json থেকে
+  const membersRes = await fetch("/data/members.json");
   const membersData = await membersRes.json();
-  total += membersData.members.length;
+  total += membersData.length; // কারণ তোমার renderMembers সরাসরি array পাচ্ছে
 
-  const pookiesRes = await fetch("pookies.json");
+  // pookies.json থেকে
+  const pookiesRes = await fetch("/data/pookies.json");
   const pookiesData = await pookiesRes.json();
-  total += pookiesData.members.length;
+  total += pookiesData.length;
 
   document.getElementById("totalCount").textContent = total;
 }
-
-getCount();
 
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
