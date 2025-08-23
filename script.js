@@ -75,17 +75,22 @@ function renderPookies(pookies) {
 async function getCount() {
   let total = 0;
 
-  // members.json থেকে
-  const membersRes = await fetch("/data/members.json");
-  const membersData = await membersRes.json();
-  total += membersData.length; // কারণ তোমার renderMembers সরাসরি array পাচ্ছে
+  try {
+    // members.json থেকে
+    const membersRes = await fetch("/data/members.json", { cache: "no-store" });
+    const membersData = await membersRes.json();
+    total += membersData.length;
 
-  // pookies.json থেকে
-  const pookiesRes = await fetch("/data/pookies.json");
-  const pookiesData = await pookiesRes.json();
-  total += pookiesData.length;
+    // pookies.json থেকে
+    const pookiesRes = await fetch("/data/pookies.json", { cache: "no-store" });
+    const pookiesData = await pookiesRes.json();
+    total += pookiesData.length;
 
-  document.getElementById("totalCount").textContent = total;
+    document.getElementById("totalCount").textContent = total;
+  } catch (err) {
+    console.error("Count লোড করার সময় error:", err);
+    document.getElementById("totalCount").textContent = "Error";
+  }
 }
 
 (async () => {
