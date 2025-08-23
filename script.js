@@ -72,6 +72,22 @@ function renderPookies(pookies) {
   });
 }
 
+async function getCount() {
+  let total = 0;
+
+  const membersRes = await fetch("members.json");
+  const membersData = await membersRes.json();
+  total += membersData.members.length;
+
+  const pookiesRes = await fetch("pookies.json");
+  const pookiesData = await pookiesRes.json();
+  total += pookiesData.members.length;
+
+  document.getElementById("totalCount").textContent = total;
+}
+
+getCount();
+
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
