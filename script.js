@@ -1,3 +1,4 @@
+// Load JSON safely
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
@@ -8,12 +9,14 @@ async function loadJSON(path) {
   }
 }
 
+// Create element from HTML string
 function el(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
 
+// Render Members (Admins)
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -37,12 +40,13 @@ function renderMembers(members) {
         </div>
         ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${m.tags?.length && m.tags[0] !== "" ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
+        ${m.tag && m.tag !== "" ? `<div class="badge">${m.tag}</div>` : ""}
       </article>
     `));
   });
 }
 
+// Render Pookies
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -66,33 +70,29 @@ function renderPookies(pookies) {
         </div>
         ${p.bio ? `<p style="margin-top:10px">${p.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${p.tags?.length && p.tags[0] !== "" ? `<div class="badge pookie-badge">${p.tags.join(" • ")}</div>` : ""}
+        ${p.tag && p.tag !== "" ? `<div class="badge pookie-badge">${p.tag}</div>` : ""}
       </article>
     `));
   });
 }
 
+// Show Total Members
 async function getCount() {
-  let total = 0;
-
   try {
-    // members.json থেকে
-    const membersRes = await fetch("/data/members.json", { cache: "no-store" });
-    const membersData = await membersRes.json();
-    total += membersData.length;
+    const membersData = await loadJSON("/data/members.json");
+    const pookiesData = await loadJSON("/data/pookies.json");
+    const total = membersData.length + pookiesData.length;
 
-    // pookies.json থেকে
-    const pookiesRes = await fetch("/data/pookies.json", { cache: "no-store" });
-    const pookiesData = await pookiesRes.json();
-    total += pookiesData.length;
-
-    document.getElementById("totalCount").textContent = total;
+    const totalEl = document.getElementById("totalCount");
+    if (totalEl) totalEl.textContent = total;
   } catch (err) {
-    console.error("Count লোড করার সময় error:", err);
-    document.getElementById("totalCount").textContent = "Error";
+    console.error("Count load error:", err);
+    const totalEl = document.getElementById("totalCount");
+    if (totalEl) totalEl.textContent = "Error";
   }
 }
 
+// Initialize
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -101,4 +101,7 @@ async function getCount() {
 
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
+
+  // Total Members
+  getCount();
 })();
