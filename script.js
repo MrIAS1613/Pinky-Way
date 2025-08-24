@@ -14,7 +14,7 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-// ------------------ Members & Pookies ------------------
+// Members rendering
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -44,6 +44,7 @@ function renderMembers(members) {
   });
 }
 
+// Pookies rendering
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -73,45 +74,71 @@ function renderPookies(pookies) {
   });
 }
 
-// ------------------ Birthday Feature ------------------
-function createConfetti(container, count = 30) {
-  for (let i = 0; i < count; i++) {
-    const confetti = document.createElement("div");
-    confetti.className = "confetti";
-    confetti.style.left = Math.random() * 100 + "%";
-    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 70%)`;
-    confetti.style.width = 5 + Math.random() * 5 + "px";
-    confetti.style.height = 5 + Math.random() * 5 + "px";
-    confetti.style.animationDelay = Math.random() * 2 + "s";
-    container.appendChild(confetti);
+// Birthday rendering
+async function renderBirthdays() {
+  try {
+    const res = await fetch("/data/birthdays.json", { cache: "no-store" });
+    const birthdays = await res.json();
+
+    const today = new Date();
+    const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
+
+    const todayDiv = document.getElementById("today-birthday");
+    const upcomingDiv = document.getElementById("upcoming-birthdays");
+
+    todayDiv.innerHTML = "";
+    upcomingDiv.innerHTML = "";
+
+    birthdays.forEach(b => {
+      const bdayStr = `${new Date(b.dob).getDate()}-${new Date(b.dob).getMonth() + 1}`;
+
+      if (bdayStr === todayStr) {
+        todayDiv.appendChild(el(`
+          <div class="birthday-row">
+            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+            <div class="birthday-text">
+              <h3>🎉 Happy Birthday, ${b.name}! 🎉</h3>
+              <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.</p>
+            </div>
+          </div>
+          <canvas id="birthday-confetti"></canvas>
+        `));
+        launchConfetti();
+      } else {
+        upcomingDiv.appendChild(el(`
+          <div class="upcoming-card">
+            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+            <p><strong>${b.name}</strong><br>${new Date(b.dob).toLocaleDateString('en-GB', { day:'2-digit', month:'short'})}</p>
+          </div>
+        `));
+      }
+    });
+
+  } catch(err) {
+    console.error("Birthday load error:", err);
   }
 }
 
-function renderBirthdays(birthdays) {
-  const todayContainer = document.getElementById("today-birthday");
-  const upcomingContainer = document.getElementById("upcoming-birthdays");
+// Confetti
+function launchConfetti() {
+  const canvas = document.getElementById("birthday-confetti");
+  if (!canvas) return;
+  const myConfetti = confetti.create(canvas, { resize: true });
+  myConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+}
 
-  const today = new Date();
-  const todayStr = `${today.getMonth() + 1}-${today.getDate()}`; // MM-DD
+// Initialize
+(async () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-  todayContainer.innerHTML = "";
-  upcomingContainer.innerHTML = "";
+  const members = await loadJSON("/data/members.json");
+  renderMembers(members);
 
-  birthdays.forEach(b => {
-    const birthDate = new Date(b.date);
-    const birthStr = `${birthDate.getMonth() + 1}-${birthDate.getDate()}`;
+  const pookies = await loadJSON("/data/pookies.json");
+  renderPookies(pookies);
 
-    // Today's Birthday
-    if (birthStr === todayStr) {
-      const card = el(`
-        <div class="birthday-card">
-          <img src="${b.avatar}" alt="${b.name}" class="birthday-avatar">
-          <div class="birthday-msg">
-            <h2>Happy Birthday ${b.name} 🎉</h2>
-            <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br>- Pinky Way family</p>
-          </div>
-        </div>
-      `);
+  await renderBirthdays();
+})();      `);
       todayContainer.appendChild(card);
       createConfetti(card, 40);
     } else if (birthDate > today) {
