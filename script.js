@@ -1,3 +1,4 @@
+// ------------------ Utilities ------------------
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
@@ -74,44 +75,79 @@ function renderPookies(pookies) {
   });
 }
 
+// ------------------ Total Pookies Count ------------------
+async function getCount() {
+  let total = 0;
+  try {
+    const membersData = await loadJSON("/data/members.json");
+    const pookiesData = await loadJSON("/data/pookies.json");
+    total = membersData.length + pookiesData.length;
+    document.getElementById("totalCount").textContent = total;
+  } catch (err) {
+    console.error("Count error:", err);
+    document.getElementById("totalCount").textContent = "Error";
+  }
+}
+
 // ------------------ Birthday Feature ------------------
 async function renderBirthdays() {
-  try {
-    const birthdays = await loadJSON("/data/birthdays.json");
+  const birthdays = await loadJSON("/data/birthdays.json");
+  const today = new Date();
+  const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
 
-    const today = new Date();
-    const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
+  const todayDiv = document.getElementById("today-birthday");
+  const upcomingDiv = document.getElementById("upcoming-birthdays");
+  todayDiv.innerHTML = "";
+  upcomingDiv.innerHTML = "";
 
-    const todayDiv = document.getElementById("today-birthday");
-    const upcomingDiv = document.getElementById("upcoming-birthdays");
+  birthdays.forEach(b => {
+    const birthDate = new Date(b.dob);
+    const bdayStr = `${birthDate.getDate()}-${birthDate.getMonth() + 1}`;
 
-    if (!todayDiv || !upcomingDiv) return;
-
-    todayDiv.innerHTML = "";
-    upcomingDiv.innerHTML = "";
-
-    birthdays.forEach(b => {
-      const birthDate = new Date(b.dob);
-      const bdayStr = `${birthDate.getDate()}-${birthDate.getMonth() + 1}`;
-
-      if (bdayStr === todayStr) {
-        todayDiv.appendChild(el(`
-          <div class="birthday-row">
-            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
-            <div class="birthday-text">
-              <h3>🎉 Happy Birthday, ${b.name}! 🎉</h3>
-              <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.</p>
-            </div>
+    if (bdayStr === todayStr) {
+      todayDiv.appendChild(el(`
+        <div class="birthday-row">
+          <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+          <div class="birthday-text">
+            <h3>🎉 Happy Birthday, ${b.name}! 🎉</h3>
+            <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br>- Pinky Way family.</p>
           </div>
-          <canvas id="birthday-confetti"></canvas>
-        `));
-        launchConfetti();
-      } else if (birthDate > today) {
-        upcomingDiv.appendChild(el(`
-          <div class="upcoming-card">
-            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
-            <p><strong>${b.name}</strong><br>${birthDate.toLocaleDateString('en-GB', { day:'2-digit', month:'short'})}</p>
-          </div>
+        </div>
+        <canvas id="birthday-confetti"></canvas>
+      `));
+      launchConfetti();
+    } else if (birthDate > today) {
+      upcomingDiv.appendChild(el(`
+        <div class="upcoming-card">
+          <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+          <p><strong>${b.name}</strong><br>${birthDate.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</p>
+        </div>
+      `));
+    }
+  });
+}
+
+// ------------------ Confetti ------------------
+function launchConfetti() {
+  const canvas = document.getElementById("birthday-confetti");
+  if (!canvas) return;
+  const myConfetti = confetti.create(canvas, { resize: true });
+  myConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+}
+
+// ------------------ Initialize Everything ------------------
+(async () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const members = await loadJSON("/data/members.json");
+  renderMembers(members);
+
+  const pookies = await loadJSON("/data/pookies.json");
+  renderPookies(pookies);
+
+  await getCount();
+  await renderBirthdays();
+})();          </div>
         `));
       }
     });
