@@ -9,10 +9,12 @@
   --border:#f1d6e0;
   --shadow: 0 10px 30px rgba(255,128,171,.15);
 
+  /* Pookie specific colors */
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
 }
 
+/* Global */
 *{box-sizing:border-box;}
 body{
   margin:0;
@@ -78,6 +80,7 @@ h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif;}
   .hero h1{font-size:32px;}
 }
 
+/* Social links */
 .social-links a {
   margin: 0 6px;
   font-size: 18px;          
@@ -89,29 +92,60 @@ h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif;}
 .social-links a:hover { color: #ff1493; transform: translateY(-1px); }
 .item .social-links { margin-top: 10px; }
 
+/* Admin & Pookie distinction */
 .admin-card { border: 2px solid var(--accent); }
 .pookie-card { border: 2px solid var(--pookie-border); }
-..pookie-badge { background: #f9a3bf; color: #5b2240; 
-}
+.pookie-badge { background: var(--pookie-badge); }
 
+/* Optional extra hover effect for pookies */
 .pookie-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,192,203,0.3); }
 
-.count-badge {
-  background: black;
-  color: pink;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 14px;
-  margin-left: 6px;
+.member-card { background: #111; padding: 15px; border-radius: 10px; color: #fff; width: 200px; box-shadow: 0 0 8px rgba(0,0,0,0.5); transition: transform 0.2s; }
+.member-card:hover { transform: translateY(-5px); }
+
+.admin-card { border: 2px solid #ff69b4; }
+.normal-card { border: 1px solid #444; }
+
+/* ---------------- Birthday Feature ---------------- */
+#birthday-section { margin-top:40px; padding:16px; }
+.birthday-card {
+  display:flex; 
+  align-items:center; 
+  background: linear-gradient(135deg, #ffe3f0, #ffb3d8);
+  padding:16px; border-radius:18px; 
+  box-shadow: var(--shadow); 
+  margin-bottom:16px; 
+  position:relative; 
+  overflow:hidden;
+}
+.birthday-avatar { width:80px; height:80px; border-radius:999px; object-fit:cover; margin-right:16px; border:2px solid var(--accent); }
+.birthday-msg h2 { margin:0 0 8px; font-size:20px; color:#ff0080; }
+.birthday-msg p { margin:0; font-size:14px; color:#5b2240; }
+
+.birthday-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:12px; }
+.upcoming-card { background:var(--card); padding:10px; border-radius:12px; box-shadow:0 5px 12px rgba(0,0,0,0.1); font-size:14px; color:var(--text); }
+
+.confetti {
+  position:absolute;
+  width:6px; height:6px;
+  background-color:#ff0;
+  top:0;
+  animation:fall 2s linear infinite;
+  pointer-events:none;
+  border-radius:50%;
 }
 
-/* Social Links */
-.social-links a {
-  color: #38bdf8;
-  margin: 0 6px;
-  font-size: 1.1rem;
-  transition: color 0.2s;
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); opacity:1; }
+  100% { transform: translateY(200px) rotate(360deg); opacity:0; }
 }
+
+@media (max-width:600px){
+  .birthday-card { flex-direction:column; text-align:center; }
+  .birthday-avatar { margin:0 0 12px 0; }
+  .birthday-msg h2 { font-size:18px; }
+  .birthday-msg p { font-size:13px; }
+}}
 .social-links a:hover {
   color: #fbbf24;
 }
