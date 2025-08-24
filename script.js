@@ -90,8 +90,13 @@ async function renderBirthdays() {
     todayDiv.innerHTML = "";
     upcomingDiv.innerHTML = "";
 
+    // Collect upcoming for sorting
+    const upcomingList = [];
+
     birthdays.forEach(b => {
       const birthDate = new Date(b.dob);
+      if (isNaN(birthDate)) return; // Skip invalid dates
+
       const bdayStr = `${birthDate.getDate()}-${birthDate.getMonth() + 1}`;
 
       if (bdayStr === todayStr) {
@@ -107,11 +112,68 @@ async function renderBirthdays() {
         `));
         launchConfetti();
       } else {
-        upcomingDiv.appendChild(el(`
-          <div class="upcoming-card">
-            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
-            <p><strong>${b.name}</strong><br>${birthDate.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</p>
-          </div>
+        // Calculate next birthday date (this year or next)
+        const currentYear = today.getFullYear();
+        let nextBday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+        if (nextBday < today) {
+          nextBday = new Date(currentYear + 1, birthDate.getMonth(), birthDate.getDate());
+        }
+        if (nextBday > today) {
+          upcomingList.push({ ...b, nextBday });
+        }
+      }
+    });
+
+    // Sort upcoming by soonest first and render
+    upcomingList.sort((a, b) => a.nextBday - b.nextBday);
+    upcomingList.forEach(u => {
+      upcomingDiv.appendChild(el(`
+        <div class="upcoming-card">
+          <img class="birthday-avatar" src="${u.avatar}" alt="${u.name}">
+          <p><strong>${u.name}</strong><br>${u.nextBday.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
+        </div>
+      `));
+    });
+  } catch (err) {
+    console.error("Birthday load error:", err);
+  }
+}
+
+// Confetti helper
+function launchConfetti() {
+  const canvas = document.getElementById("birthday-confetti");
+  if (!canvas) return;
+  const myConfetti = confetti.create(canvas, { resize: true });
+  myConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+}
+
+// ------------------ Total Pookies Count ------------------
+async function getCount() {
+  let total = 0;
+  try {
+    const membersData = await loadJSON("/data/members.json");
+    const pookiesData = await loadJSON("/data/pookies.json");
+    total = membersData.length + pookiesData.length;
+    document.getElementById("totalCount").textContent = total;
+  } catch (err) {
+    console.error("Count error:", err);
+    document.getElementById("totalCount").textContent = "Error";
+  }
+}
+
+// ------------------ Init ------------------
+(async () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const members = await loadJSON("/data/members.json");
+  renderMembers(members);
+
+  const pookies = await loadJSON("/data/pookies.json");
+  renderPookies(pookies);
+
+  await renderBirthdays();
+  await getCount();
+})();          </div>
         `));
       }
     });
