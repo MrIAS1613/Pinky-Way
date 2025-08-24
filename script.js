@@ -14,7 +14,7 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-// Members rendering
+// ------------------ Members ------------------
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -44,7 +44,7 @@ function renderMembers(members) {
   });
 }
 
-// Pookies rendering
+// ------------------ Pookies ------------------
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -74,11 +74,10 @@ function renderPookies(pookies) {
   });
 }
 
-// Birthday rendering
+// ------------------ Birthday Feature ------------------
 async function renderBirthdays() {
   try {
-    const res = await fetch("/data/birthdays.json", { cache: "no-store" });
-    const birthdays = await res.json();
+    const birthdays = await loadJSON("/data/birthdays.json");
 
     const today = new Date();
     const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
@@ -86,11 +85,14 @@ async function renderBirthdays() {
     const todayDiv = document.getElementById("today-birthday");
     const upcomingDiv = document.getElementById("upcoming-birthdays");
 
+    if (!todayDiv || !upcomingDiv) return;
+
     todayDiv.innerHTML = "";
     upcomingDiv.innerHTML = "";
 
     birthdays.forEach(b => {
-      const bdayStr = `${new Date(b.dob).getDate()}-${new Date(b.dob).getMonth() + 1}`;
+      const birthDate = new Date(b.dob);
+      const bdayStr = `${birthDate.getDate()}-${birthDate.getMonth() + 1}`;
 
       if (bdayStr === todayStr) {
         todayDiv.appendChild(el(`
@@ -104,14 +106,61 @@ async function renderBirthdays() {
           <canvas id="birthday-confetti"></canvas>
         `));
         launchConfetti();
-      } else {
+      } else if (birthDate > today) {
         upcomingDiv.appendChild(el(`
           <div class="upcoming-card">
             <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
-            <p><strong>${b.name}</strong><br>${new Date(b.dob).toLocaleDateString('en-GB', { day:'2-digit', month:'short'})}</p>
+            <p><strong>${b.name}</strong><br>${birthDate.toLocaleDateString('en-GB', { day:'2-digit', month:'short'})}</p>
           </div>
         `));
       }
+    });
+
+  } catch(err) {
+    console.error("Birthday load error:", err);
+  }
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById("birthday-confetti");
+  if (!canvas) return;
+  const myConfetti = confetti.create(canvas, { resize: true });
+  myConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+}
+
+// ------------------ Total Pookies Count ------------------
+async function getCount() {
+  let total = 0;
+  try {
+    const membersRes = await fetch("/data/members.json", { cache: "no-store" });
+    const membersData = await membersRes.json();
+    total += membersData.length;
+
+    const pookiesRes = await fetch("/data/pookies.json", { cache: "no-store" });
+    const pookiesData = await pookiesRes.json();
+    total += pookiesData.length;
+
+    document.getElementById("totalCount").textContent = total;
+  } catch (err) {
+    console.error("Count লোড করার সময় error:", err);
+    document.getElementById("totalCount").textContent = "Error";
+  }
+}
+
+// ------------------ Initialize ------------------
+(async () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const members = await loadJSON("/data/members.json");
+  renderMembers(members);
+
+  const pookies = await loadJSON("/data/pookies.json");
+  renderPookies(pookies);
+
+  await renderBirthdays(); // <-- New feature added safely
+
+  await getCount();
+})();      }
     });
 
   } catch(err) {
