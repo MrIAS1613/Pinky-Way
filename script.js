@@ -82,6 +82,40 @@ function renderPookies(pookies) {
   document.getElementById("memberCount").textContent = pookies.length;
 }
 
+async function loadBirthdays() {
+  const res = await fetch('birthdays.json');
+  const data = await res.json();
+
+  const today = new Date();
+  const todayStr = `${today.getMonth()+1}-${today.getDate()}`;
+
+  let todayList = "";
+  let upcomingList = "";
+
+  data.forEach(person => {
+    const dob = new Date(person.dob);
+    const dobStr = `${dob.getMonth()+1}-${dob.getDate()}`;
+
+    if(dobStr === todayStr){
+      todayList += `<div class="card">
+        <img src="${person.avatar}" alt="${person.name}" />
+        <h3>${person.name}</h3>
+        <p>${person.bio}</p>
+      </div>`;
+    } else {
+      upcomingList += `<div class="card upcoming">
+        <h3>${person.name}</h3>
+        <p>Birthday: ${dob.getDate()}-${dob.getMonth()+1}</p>
+      </div>`;
+    }
+  });
+
+  document.getElementById("today-birthdays").innerHTML = todayList || "<p>No birthdays today 🎂</p>";
+  document.getElementById("upcoming-birthdays").innerHTML = upcomingList;
+}
+
+loadBirthdays();
+
 // Update Total Pookies
 async function updatePookieCount() {
   try {
