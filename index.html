@@ -1,75 +1,75 @@
 <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pinky Way</title>
+  <meta name="description" content="Pinky Way is a wholesome, toxic-free community for pookies, friends, and kind souls." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <header class="shell">
+    <nav class="nav">
+      <a href="#home" class="brand">
+        <img src="pinky-way-logo.jpg" alt="Pinky Way Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 8px;">
+        Pinky Way
+      </a>
+      <div class="links">
+        <a href="#members">Members</a>
+        <a href="#about">About</a>
+      </div>
+    </nav>
 
-<html lang="en">    
-<head>    
-  <meta charset="utf-8" />    
-  <meta name="viewport" content="width=device-width,initial-scale=1" />    
-  <title> Pinky Way </title>    
-  <meta name="description" content="Pinky Way is a wholesome, toxic-free community for pookies, friends, and kind souls." />    
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>    
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">    
-  <link rel="stylesheet" href="styles.css" />    
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"     
-  /> 
-  
-</head>    
-<body>    
-  <header class="shell">    
-    <nav class="nav">    
-  <a href="#home" class="brand">    
-  <img src="pinky-way-logo.jpg" alt="Pinky Way Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 8px;"> Pinky Way    
-  </a>    
-  <div class="links">    
-    <a href="#members">Members</a>    
-    <a href="#about">About</a>    
-  </div>    
-    </nav>    
-    <section id="home" class="hero">    
-      <h1>Hello Cuties!</h1>    
-      <p class="sub">A pookie community for connection, laughter, and support.</p>    
-    </section>    
-  </header>    
-  
-  <main class="shell">    
-    <section id="about" class="card">    
-      <h2>About us</h2>    
-      <p>We’re a community built on good vibes only. Where pookies, friends, and kind souls gather. No toxicity, no drama! Just connection, laughter, and support for each other. A safe space to be yourself, share love and grow together.</p>    
-    </section>  
-    
- <section id="birthday-section">
-  <h2>🎉 Birthday Celebrations 🎉</h2>
+    <section id="home" class="hero">
+      <h1>Hello Cuties!</h1>
+      <p class="sub">A pookie community for connection, laughter, and support.</p>
+    </section>
+  </header>
 
-  <!-- Today's Birthday -->
-  <div id="today-birthday" class="birthday-card"></div>
+  <main class="shell">
+    <section id="about" class="card">
+      <h2>About us</h2>
+      <p>We’re a community built on good vibes only. Where pookies, friends, and kind souls gather. No toxicity, no drama! Just connection, laughter, and support for each other. A safe space to be yourself, share love and grow together.</p>
+    </section>
 
-  <!-- Upcoming Birthdays -->
-  <h3>Upcoming Birthdays</h3>
-  <div id="upcoming-birthdays" class="birthday-grid"></div>
- </section>
-    
-      <header>
-    <h1>Our Pookies</h1>
-      </header>
-    
-    <p><b> Total Number of Pookies: <span id="totalCount">0</span></b></p>
-    
-   <section id="members">    
-  <h2>Admins <span id="adminCount" class="count-badge"></span></h2>    
-  <div id="members-grid" class="grid"></div>    
-</section>
+    <section id="birthday-section">
+      <h2>🎉 Birthday Celebrations 🎉</h2>
 
-<section id="pookies">    
-  <h2>Members <span id="memberCount" class="count-badge"></span></h2>    
-  <div id="pookies-grid" class="grid"></div>    
-</section>
-    
-    <footer class="shell foot">    
-    <p>© <span id="year"></span> Pinky Way •    
-      All rights are reserved• </p>    
-  </footer>    
-    
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script src="script.js" defer></script>  
-</body>    
-</html> 
+      <!-- Today's Birthday -->
+      <div id="today-birthday" class="birthday-card"></div>
 
+      <!-- Upcoming Birthdays -->
+      <h3>Upcoming Birthdays</h3>
+      <div id="upcoming-birthdays" class="birthday-grid"></div>
+    </section>
+
+    <section>
+      <h1>Our Pookies</h1>
+      <p><b>Total Number of Pookies: <span id="totalCount">0</span></b></p>
+    </section>
+
+    <section id="members">
+      <h2>Admins <span id="adminCount" class="count-badge"></span></h2>
+      <div id="members-grid" class="grid"></div>
+    </section>
+
+    <section id="pookies">
+      <h2>Members <span id="memberCount" class="count-badge"></span></h2>
+      <div id="pookies-grid" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="shell foot">
+    <p>© <span id="year"></span> Pinky Way • All rights are reserved •</p>
+  </footer>
+
+  <!-- Confetti lib MUST be before your script -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- Your main JS -->
+  <script src="script.js" defer></script>
+</body>
+</html>
