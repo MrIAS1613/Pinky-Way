@@ -83,38 +83,65 @@ function renderPookies(pookies) {
 }
 
 async function loadBirthdays() {
-  const res = await fetch('birthdays.json');
-  const data = await res.json();
+  try {
+    const res = await fetch("/data/birthdays.json", { cache: "no-store" });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+function renderBirthdays(birthdays) {
+  const todayContainer = document.getElementById("today-birthdays");
+  const upcomingContainer = document.getElementById("upcoming-birthdays");
+
+  if (!todayContainer || !upcomingContainer) return;
+
+  todayContainer.innerHTML = "";
+  upcomingContainer.innerHTML = "";
 
   const today = new Date();
-  const todayStr = `${today.getMonth()+1}-${today.getDate()}`;
+  const todayMonthDay = `${today.getMonth() + 1}-${today.getDate()}`;
 
-  let todayList = "";
-  let upcomingList = "";
+  const upcoming = [];
 
-  data.forEach(person => {
-    const dob = new Date(person.dob);
-    const dobStr = `${dob.getMonth()+1}-${dob.getDate()}`;
+  birthdays.forEach(b => {
+    const dob = new Date(b.dob);
+    const monthDay = `${dob.getMonth() + 1}-${dob.getDate()}`;
+    const html = `
+      <div class="birthday-card">
+        ${b.avatar ? `<img class="avatar" src="${b.avatar}" alt="${b.name}">` : ""}
+        <span>${b.name} - ${dob.getDate()}/${dob.getMonth() + 1}</span>
+      </div>
+    `;
 
-    if(dobStr === todayStr){
-      todayList += `<div class="card">
-        <img src="${person.avatar}" alt="${person.name}" />
-        <h3>${person.name}</h3>
-        <p>${person.bio}</p>
-      </div>`;
+    if (monthDay === todayMonthDay) {
+      todayContainer.innerHTML += html;
     } else {
-      upcomingList += `<div class="card upcoming">
-        <h3>${person.name}</h3>
-        <p>Birthday: ${dob.getDate()}-${dob.getMonth()+1}</p>
-      </div>`;
+      upcoming.push({ ...b, dob });
     }
   });
 
-  document.getElementById("today-birthdays").innerHTML = todayList || "<p>No birthdays today 🎂</p>";
-  document.getElementById("upcoming-birthdays").innerHTML = upcomingList;
+  // Sort upcoming by nearest date
+  upcoming.sort((a, b) => a.dob - b.dob);
+
+  upcoming.forEach(b => {
+    const html = `
+      <div class="birthday-card">
+        ${b.avatar ? `<img class="avatar" src="${b.avatar}" alt="${b.name}">` : ""}
+        <span>${b.name} - ${b.dob.getDate()}/${b.dob.getMonth() + 1}</span>
+      </div>
+    `;
+    upcomingContainer.innerHTML += html;
+  });
 }
 
-loadBirthdays();
+// Initialize Birthday Section
+(async () => {
+  const birthdays = await loadBirthdays();
+  renderBirthdays(birthdays);
+})();
 
 // Update Total Pookies
 async function updatePookieCount() {
