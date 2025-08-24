@@ -44,6 +44,9 @@ function renderMembers(members) {
       </article>
     `));
   });
+
+  // live count update
+  document.getElementById("adminCount").textContent = members.length;
 }
 
 // Render Pookies
@@ -74,6 +77,9 @@ function renderPookies(pookies) {
       </article>
     `));
   });
+
+  // live count update
+  document.getElementById("memberCount").textContent = pookies.length;
 }
 
 // Update Total Pookies
