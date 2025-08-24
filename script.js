@@ -1,4 +1,3 @@
-// Load JSON safely
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
@@ -9,14 +8,13 @@ async function loadJSON(path) {
   }
 }
 
-// Create element from HTML string
 function el(html) {
   const t = document.createElement("template");
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
 
-// Render Members (Admins)
+// ------------------ Members & Pookies ------------------
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -44,12 +42,8 @@ function renderMembers(members) {
       </article>
     `));
   });
-
-  // live count update
-  document.getElementById("adminCount").textContent = members.length;
 }
 
-// Render Pookies
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -77,85 +71,81 @@ function renderPookies(pookies) {
       </article>
     `));
   });
-
-  // live count update
-  document.getElementById("memberCount").textContent = pookies.length;
 }
 
-async function loadBirthdays() {
-  try {
-    const res = await fetch("/data/birthdays.json", { cache: "no-store" });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
-    return [];
+// ------------------ Birthday Feature ------------------
+function createConfetti(container, count = 30) {
+  for (let i = 0; i < count; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.style.left = Math.random() * 100 + "%";
+    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 70%)`;
+    confetti.style.width = 5 + Math.random() * 5 + "px";
+    confetti.style.height = 5 + Math.random() * 5 + "px";
+    confetti.style.animationDelay = Math.random() * 2 + "s";
+    container.appendChild(confetti);
   }
 }
 
 function renderBirthdays(birthdays) {
-  const todayContainer = document.getElementById("today-birthdays");
+  const todayContainer = document.getElementById("today-birthday");
   const upcomingContainer = document.getElementById("upcoming-birthdays");
 
-  if (!todayContainer || !upcomingContainer) return;
+  const today = new Date();
+  const todayStr = `${today.getMonth() + 1}-${today.getDate()}`; // MM-DD
 
   todayContainer.innerHTML = "";
   upcomingContainer.innerHTML = "";
 
-  const today = new Date();
-  const todayMonthDay = `${today.getMonth() + 1}-${today.getDate()}`;
-
-  const upcoming = [];
-
   birthdays.forEach(b => {
-    const dob = new Date(b.dob);
-    const monthDay = `${dob.getMonth() + 1}-${dob.getDate()}`;
-    const html = `
-      <div class="birthday-card">
-        ${b.avatar ? `<img class="avatar" src="${b.avatar}" alt="${b.name}">` : ""}
-        <span>${b.name} - ${dob.getDate()}/${dob.getMonth() + 1}</span>
-      </div>
-    `;
+    const birthDate = new Date(b.date);
+    const birthStr = `${birthDate.getMonth() + 1}-${birthDate.getDate()}`;
 
-    if (monthDay === todayMonthDay) {
-      todayContainer.innerHTML += html;
-    } else {
-      upcoming.push({ ...b, dob });
+    // Today's Birthday
+    if (birthStr === todayStr) {
+      const card = el(`
+        <div class="birthday-card">
+          <img src="${b.avatar}" alt="${b.name}" class="birthday-avatar">
+          <div class="birthday-msg">
+            <h2>Happy Birthday ${b.name} 🎉</h2>
+            <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br>- Pinky Way family</p>
+          </div>
+        </div>
+      `);
+      todayContainer.appendChild(card);
+      createConfetti(card, 40);
+    } else if (birthDate > today) {
+      // Upcoming Birthday
+      const upCard = el(`
+        <div class="upcoming-card">
+          <p><strong>${b.name}</strong> - ${birthDate.toLocaleDateString()}</p>
+        </div>
+      `);
+      upcomingContainer.appendChild(upCard);
     }
-  });
-
-  // Sort upcoming by nearest date
-  upcoming.sort((a, b) => a.dob - b.dob);
-
-  upcoming.forEach(b => {
-    const html = `
-      <div class="birthday-card">
-        ${b.avatar ? `<img class="avatar" src="${b.avatar}" alt="${b.name}">` : ""}
-        <span>${b.name} - ${b.dob.getDate()}/${b.dob.getMonth() + 1}</span>
-      </div>
-    `;
-    upcomingContainer.innerHTML += html;
   });
 }
 
-// Initialize Birthday Section
-(async () => {
-  const birthdays = await loadBirthdays();
-  renderBirthdays(birthdays);
-})();
-
-// Update Total Pookies
-async function updatePookieCount() {
+// ------------------ Total Pookies Count ------------------
+async function getCount() {
+  let total = 0;
   try {
+    const membersRes = await fetch("/data/members.json", { cache: "no-store" });
+    const membersData = await membersRes.json();
+    total += membersData.length;
+
     const pookiesRes = await fetch("/data/pookies.json", { cache: "no-store" });
     const pookiesData = await pookiesRes.json();
-    document.getElementById("totalCount").textContent = pookiesData.length;
+    total += pookiesData.length;
+
+    document.getElementById("totalCount").textContent = total;
   } catch (err) {
-    console.error("Error loading pookies count:", err);
+    console.error("Count লোড করার সময় error:", err);
     document.getElementById("totalCount").textContent = "Error";
   }
 }
 
-// Initialize
+// ------------------ Init ------------------
 (async () => {
   document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -165,5 +155,8 @@ async function updatePookieCount() {
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 
-  updatePookieCount(); // Show total pookies
+  const birthdays = await loadJSON("/data/birthdays.json");
+  renderBirthdays(birthdays);
+
+  await getCount();
 })();
