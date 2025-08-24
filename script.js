@@ -19,11 +19,10 @@ function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
   grid.innerHTML = "";
-  document.getElementById("adminCount").textContent = members.length;
 
   members.forEach(m => {
     const links = [];
-    if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank"><i class="fa-solid fa-car"></i></a>`);
+    if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
     if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
     if (m.links?.email) links.push(`<a href="mailto:${m.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
@@ -43,6 +42,9 @@ function renderMembers(members) {
       </article>
     `));
   });
+  
+  // Update admin count
+  document.getElementById("adminCount").textContent = `(${members.length})`;
 }
 
 // ------------------ Pookies ------------------
@@ -50,7 +52,6 @@ function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
   grid.innerHTML = "";
-  document.getElementById("memberCount").textContent = pookies.length;
 
   pookies.forEach(p => {
     const links = [];
@@ -74,16 +75,19 @@ function renderPookies(pookies) {
       </article>
     `));
   });
+  
+  // Update member count
+  document.getElementById("memberCount").textContent = `(${pookies.length})`;
 }
 
 // ------------------ Birthdays ------------------
 async function renderBirthdays() {
   try {
-    const birthdays = await loadJSON("/data/birthdays.json");
-
+    const birthdays = await loadJSON("data/birthdays.json");
     const today = new Date();
-    const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
-
+    // Format today's date as YYYY-MM-DD for comparison
+    const todayStr = today.toISOString().split('T')[0];
+    
     const todayDiv = document.getElementById("today-birthday");
     const upcomingDiv = document.getElementById("upcoming-birthdays");
 
@@ -91,27 +95,93 @@ async function renderBirthdays() {
 
     todayDiv.innerHTML = "";
     upcomingDiv.innerHTML = "";
+    
+    let hasBirthdayToday = false;
+    const upcomingBirthdays = [];
 
     birthdays.forEach(b => {
-      const birthDate = new Date(b.dob);
-      const bdayStr = `${birthDate.getDate()}-${birthDate.getMonth() + 1}`;
-
-      if (bdayStr === todayStr) {
+      // Extract just the date part (YYYY-MM-DD) for comparison
+      const birthDateStr = b.dob;
+      
+      if (birthDateStr === todayStr) {
+        hasBirthdayToday = true;
         todayDiv.appendChild(el(`
           <div class="birthday-row">
             <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
             <div class="birthday-text">
               <h3>🎉 Happy Birthday, ${b.name}! 🎉</h3>
-              <p>Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.</p>
+              <p>${b.bio || "Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀!"} <br> - Pinky Way family.</p>
             </div>
           </div>
-          <canvas id="birthday-confetti"></canvas>
         `));
         launchConfetti();
       } else {
-        upcomingDiv.appendChild(el(`
-          <div class="upcoming-card">
-            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+        // Store for upcoming birthdays
+        upcomingBirthdays.push({
+          name: b.name,
+          avatar: b.avatar,
+          date: new Date(b.dob)
+        });
+      }
+    });
+    
+    // Sort upcoming birthdays by date
+    upcomingBirthdays.sort((a, b) => a.date - b.date);
+    
+    // Display upcoming birthdays
+    upcomingBirthdays.forEach(b => {
+      upcomingDiv.appendChild(el(`
+        <div class="upcoming-card">
+          <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
+          <p><strong>${b.name}</strong><br>${b.date.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</p>
+        </div>
+      `));
+    });
+    
+    if (!hasBirthdayToday) {
+      todayDiv.innerHTML = "<p>No birthdays today. Check out upcoming birthdays below!</p>";
+    }
+  } catch(err) {
+    console.error("Birthday load error:", err);
+    document.getElementById("today-birthday").innerHTML = "<p>Error loading birthday data.</p>";
+  }
+}
+
+// Confetti helper
+function launchConfetti() {
+  confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+}
+
+// ------------------ Total Pookies Count ------------------
+async function getCount() {
+  try {
+    const membersData = await loadJSON("data/members.json");
+    const pookiesData = await loadJSON("data/pookies.json");
+    const total = membersData.length + pookiesData.length;
+    document.getElementById("totalCount").textContent = total;
+  } catch(err) {
+    console.error("Count error:", err);
+    document.getElementById("totalCount").textContent = "Error";
+  }
+}
+
+// ------------------ Initialize Everything ------------------
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  try {
+    const members = await loadJSON("data/members.json");
+    renderMembers(members);
+
+    const pookies = await loadJSON("data/pookies.json");
+    renderPookies(pookies);
+
+    await renderBirthdays();
+    await getCount();
+  } catch (error) {
+    console.error("Error initializing app:", error);
+  }
+});            <img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">
             <p><strong>${b.name}</strong><br>${birthDate.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</p>
           </div>
         `));
