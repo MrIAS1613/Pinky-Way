@@ -219,8 +219,8 @@ async function renderBirthdays() {
                    style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
             </div>
             <div class="birthday-text">
-              <h3 style="font-size:28px;margin:0 0 10px">🎉 Happy Birthday 🎉</h3>
-              <p style="margin:0 0 6px"><strong>${b.name}</strong></p>
+              <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
+              <b><p style="margin:0 0 6px"><strong>${b.name}</strong></p></b>
               <p class="birthday-bio" style="margin:0;color:#111">${msg}</p>
             </div>
           </div>
