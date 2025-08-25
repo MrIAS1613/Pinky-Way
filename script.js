@@ -109,7 +109,7 @@ async function getCount() {
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   if (typeof confetti !== "function" || !container) return;
 
-  // Make a canvas overlay inside the container (no CSS change needed)
+  // Make a canvas overlay inside the container
   const canvas = document.createElement("canvas");
   Object.assign(canvas.style, {
     position: "absolute",
@@ -128,10 +128,18 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   const end = Date.now() + ms;
 
   (function frame() {
-    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 0 } });
-    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 1 } });
-    if (Date.now() < end) requestAnimationFrame(frame);
-    else canvas.remove();
+    // 🎉 lighter, smoother confetti
+    c({
+      particleCount: 50,
+      spread: 120,
+      startVelocity: 25,
+      origin: { x: Math.random(), y: Math.random() - 0.2 }
+    });
+    if (Date.now() < end) {
+      setTimeout(() => requestAnimationFrame(frame), 400);
+    } else {
+      canvas.remove();
+    }
   })();
 }
 
@@ -146,8 +154,7 @@ async function playBirthdayAudio() {
     audio.currentTime = 0;
     await audio.play();
   } catch (e) {
-    // Likely autoplay blocked; will play on user interaction
-    // console.debug("Audio play was blocked until user interaction.");
+    // Autoplay might be blocked; will play on first click/tap
   }
 }
 
@@ -214,14 +221,14 @@ async function renderBirthdays() {
             <div class="birthday-text">
               <h3 style="font-size:28px;margin:0 0 10px">🎉 Happy Birthday 🎉</h3>
               <p style="margin:0 0 6px"><strong>${b.name}</strong></p>
-              <p class="birthday-bio" style="margin:0">${msg}</p>
+              <p class="birthday-bio" style="margin:0;color:#111">${msg}</p>
             </div>
           </div>
         `);
 
         todayWrap.appendChild(card);
 
-        // Start confetti + audio in sync for today's card(s)
+        // Confetti + audio
         launchCardConfetti(card, CONFETTI_DURATION_MS);
         if (!birthdayAudioStarted) {
           playBirthdayAudio();
@@ -256,10 +263,9 @@ function setupReconfettiTriggers() {
 
   const retrigger = () => {
     launchCardConfetti(section, CONFETTI_DURATION_MS);
-    playBirthdayAudio(); // try to play (works after first user gesture if autoplay was blocked)
+    playBirthdayAudio();
   };
 
-  // Use multiple events to cover mobile & desktop
   ["pointerdown", "click", "touchstart"].forEach(evt => {
     section.addEventListener(evt, retrigger, { passive: true });
   });
@@ -276,9 +282,8 @@ function setupReconfettiTriggers() {
   const pookies = await loadJSON("/data/pookies.json");
   renderPookies(pookies);
 
-  await getCount();       // updates totalCount if exists
+  await getCount();
   await renderBirthdays();
 
-  // enable re-confetti on interaction
   setupReconfettiTriggers();
 })();
