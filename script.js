@@ -103,28 +103,7 @@ async function getCount() {
 
 // ---------- Birthdays ----------
 function isTodayDOB(dob) {
-  const d = new Date(dob);
-  if (isNaN(d)) return false;
-  const today = new Date();
-  return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
-}
 
-function nextOccurrence(dob) {
-  const d = new Date(dob);
-  const today = new Date();
-  let next = new Date(today.getFullYear(), d.getMonth(), d.getDate());
-  if (next < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-    next.setFullYear(today.getFullYear() + 1);
-  }
-  return next;
-}
-
-function formatDayMonth(date) {
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-}
-
-function launchCardConfetti(container, ms = 5000) {
-  if (typeof confetti !== "function") return; // CDN missing guard
 
   // make a canvas overlay inside the container (no CSS change needed)
   const canvas = document.createElement("canvas");
@@ -164,7 +143,50 @@ async function renderBirthdays() {
 
     const todays = list.filter(b => isTodayDOB(b.dob));
     const upcoming = list
-      .filter(b => !isTodayDOB(b.dob))
+    async function loadBirthdays() {
+  const res = await fetch("birthdays.json");
+  const data = await res.json();
+
+  const today = new Date();
+  const todayStr = today.toISOString().slice(5, 10); // MM-DD
+
+  const birthdaySection = document.getElementById("birthday-section");
+  const avatar = document.getElementById("birthday-avatar");
+  const text = document.getElementById("birthday-text");
+
+  const todayBirthday = data.find(person => person.dob.slice(5, 10) === todayStr);
+
+  if (todayBirthday) {
+    birthdaySection.classList.remove("hidden");
+    avatar.src = todayBirthday.avatar;
+    text.textContent = todayBirthday.bio;
+
+    // প্রথম 10 সেকেন্ডের confetti
+    startConfetti(10000);
+
+    // যখনই কেউ touch/click/hover করবে, আবার confetti হবে
+    birthdaySection.addEventListener("click", () => startConfetti(10000));
+    birthdaySection.addEventListener("mouseenter", () => startConfetti(10000));
+    birthdaySection.addEventListener("touchstart", () => startConfetti(10000));
+  }
+}
+
+// Confetti library (Canvas Confetti)
+function startConfetti(duration) {
+  const end = Date.now() + duration;
+  (function frame() {
+    confetti({
+      particleCount: 5,
+      spread: 100,
+      origin: { y: 0.6 }
+    });
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+}
+
+loadBirthdays();  .filter(b => !isTodayDOB(b.dob))
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
       .sort((a, b) => a._next - b._next)
       .slice(0, 8);
