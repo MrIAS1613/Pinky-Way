@@ -1,3 +1,7 @@
+// ---------- Config ----------
+const CONFETTI_DURATION_MS = 10000; // 10s (was 5s)
+const BIRTHDAY_AUDIO_ID = "birthday-audio";
+
 // ---------- Helpers ----------
 async function loadJSON(path) {
   try {
@@ -85,7 +89,7 @@ function renderPookies(pookies) {
   if (memberCount) memberCount.textContent = pookies.length;
 }
 
-// ---------- Total Count (optional badge on top) ----------
+// ---------- Total Count ----------
 async function getCount() {
   try {
     const members = await loadJSON("/data/members.json");
@@ -98,6 +102,52 @@ async function getCount() {
     console.error("Count error:", err);
     const totalCountEl = document.getElementById("totalCount");
     if (totalCountEl) totalCountEl.textContent = "Error";
+  }
+}
+
+// ---------- Confetti + Audio ----------
+function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
+  if (typeof confetti !== "function" || !container) return;
+
+  // Make a canvas overlay inside the container (no CSS change needed)
+  const canvas = document.createElement("canvas");
+  Object.assign(canvas.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    pointerEvents: "none",
+    zIndex: "10",
+  });
+  if (getComputedStyle(container).position === "static") {
+    container.style.position = "relative";
+  }
+  container.appendChild(canvas);
+
+  const c = confetti.create(canvas, { resize: true });
+  const end = Date.now() + ms;
+
+  (function frame() {
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 0 } });
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 1 } });
+    if (Date.now() < end) requestAnimationFrame(frame);
+    else canvas.remove();
+  })();
+}
+
+function getBirthdayAudio() {
+  return document.getElementById(BIRTHDAY_AUDIO_ID);
+}
+
+async function playBirthdayAudio() {
+  const audio = getBirthdayAudio();
+  if (!audio) return;
+  try {
+    audio.currentTime = 0;
+    await audio.play();
+  } catch (e) {
+    // Likely autoplay blocked; will play on user interaction
+    // console.debug("Audio play was blocked until user interaction.");
   }
 }
 
@@ -123,32 +173,7 @@ function formatDayMonth(date) {
   return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
-function launchCardConfetti(container, ms = 5000) {
-  if (typeof confetti !== "function") return; // CDN missing guard
-
-  // make a canvas overlay inside the container (no CSS change needed)
-  const canvas = document.createElement("canvas");
-  Object.assign(canvas.style, {
-    position: "absolute",
-    inset: "0",
-    width: "100%",
-    height: "100%",
-    pointerEvents: "none",
-    zIndex: "10",
-  });
-  container.style.position = container.style.position || "relative";
-  container.appendChild(canvas);
-
-  const c = confetti.create(canvas, { resize: true });
-  const end = Date.now() + ms;
-
-  (function frame() {
-    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 0 } });
-    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 1 } });
-    if (Date.now() < end) requestAnimationFrame(frame);
-    else canvas.remove();
-  })();
-}
+let birthdayAudioStarted = false;
 
 async function renderBirthdays() {
   const todayWrap = document.getElementById("today-birthday");
@@ -162,14 +187,14 @@ async function renderBirthdays() {
     const list = await loadJSON("/data/birthdays.json");
     if (!Array.isArray(list)) return;
 
-    const todays = list.filter(b => isTodayDOB(b.dob));
+    const todays = list.filter(b => b.dob && isTodayDOB(b.dob));
     const upcoming = list
-      .filter(b => !isTodayDOB(b.dob))
+      .filter(b => b.dob && !isTodayDOB(b.dob))
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
       .sort((a, b) => a._next - b._next)
       .slice(0, 8);
 
-    // --- Today cards (left avatar, right text, big heading, custom text) ---
+    // --- Today cards ---
     if (todays.length === 0) {
       todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     } else {
@@ -187,15 +212,21 @@ async function renderBirthdays() {
                    style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
             </div>
             <div class="birthday-text">
-              <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
+              <h3 style="font-size:28px;margin:0 0 10px">🎉 Happy Birthday 🎉</h3>
               <p style="margin:0 0 6px"><strong>${b.name}</strong></p>
-              <p style="margin:0">${msg}</p>
+              <p class="birthday-bio" style="margin:0">${msg}</p>
             </div>
           </div>
         `);
 
         todayWrap.appendChild(card);
-        launchCardConfetti(card, 5000);
+
+        // Start confetti + audio in sync for today's card(s)
+        launchCardConfetti(card, CONFETTI_DURATION_MS);
+        if (!birthdayAudioStarted) {
+          playBirthdayAudio();
+          birthdayAudioStarted = true;
+        }
       });
     }
 
@@ -218,6 +249,22 @@ async function renderBirthdays() {
   }
 }
 
+// ---------- Re-confetti on touch/click ----------
+function setupReconfettiTriggers() {
+  const section = document.getElementById("birthday-section");
+  if (!section) return;
+
+  const retrigger = () => {
+    launchCardConfetti(section, CONFETTI_DURATION_MS);
+    playBirthdayAudio(); // try to play (works after first user gesture if autoplay was blocked)
+  };
+
+  // Use multiple events to cover mobile & desktop
+  ["pointerdown", "click", "touchstart"].forEach(evt => {
+    section.addEventListener(evt, retrigger, { passive: true });
+  });
+}
+
 // ---------- Init ----------
 (async () => {
   const y = document.getElementById("year");
@@ -231,4 +278,7 @@ async function renderBirthdays() {
 
   await getCount();       // updates totalCount if exists
   await renderBirthdays();
+
+  // enable re-confetti on interaction
+  setupReconfettiTriggers();
 })();
