@@ -109,7 +109,6 @@ async function getCount() {
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   if (typeof confetti !== "function" || !container) return;
 
-  // Make a canvas overlay inside the container
   const canvas = document.createElement("canvas");
   Object.assign(canvas.style, {
     position: "absolute",
@@ -128,18 +127,10 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   const end = Date.now() + ms;
 
   (function frame() {
-    // 🎉 lighter, smoother confetti
-    c({
-      particleCount: 50,
-      spread: 120,
-      startVelocity: 25,
-      origin: { x: Math.random(), y: Math.random() - 0.2 }
-    });
-    if (Date.now() < end) {
-      setTimeout(() => requestAnimationFrame(frame), 400);
-    } else {
-      canvas.remove();
-    }
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 0 } });
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 1 } });
+    if (Date.now() < end) requestAnimationFrame(frame);
+    else canvas.remove();
   })();
 }
 
@@ -153,9 +144,7 @@ async function playBirthdayAudio() {
   try {
     audio.currentTime = 0;
     await audio.play();
-  } catch (e) {
-    // Autoplay might be blocked; will play on first click/tap
-  }
+  } catch (e) {}
 }
 
 // ---------- Birthdays ----------
@@ -198,8 +187,7 @@ async function renderBirthdays() {
     const upcoming = list
       .filter(b => b.dob && !isTodayDOB(b.dob))
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
-      .sort((a, b) => a._next - b._next)
-      .slice(0, 8);
+      .sort((a, b) => a._next - b._next);
 
     // --- Today cards ---
     if (todays.length === 0) {
@@ -219,16 +207,16 @@ async function renderBirthdays() {
                    style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
             </div>
             <div class="birthday-text">
-              <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
-              <b><p style="margin:0 0 6px"><strong>${b.name}</strong></p></b>
-              <p class="birthday-bio" style="margin:0;color:#111">${msg}</p>
+              <h3 style="font-size:28px;margin:0 0 10px">🎉 Happy Birthday 🎉</h3>
+              <p style="margin:0 0 6px"><strong>${b.name}</strong></p>
+              <p class="birthday-bio" style="margin:0">${msg}</p>
             </div>
           </div>
         `);
 
         todayWrap.appendChild(card);
 
-        // Confetti + audio
+        // Only today triggers confetti + audio
         launchCardConfetti(card, CONFETTI_DURATION_MS);
         if (!birthdayAudioStarted) {
           playBirthdayAudio();
@@ -237,11 +225,12 @@ async function renderBirthdays() {
       });
     }
 
-    // --- Upcoming mini cards ---
-    if (upcoming.length === 0) {
+    // --- Upcoming mini card (only 1) ---
+    const upcomingLimited = upcoming.slice(0, 1);
+    if (upcomingLimited.length === 0) {
       upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
     } else {
-      upcoming.forEach(b => {
+      upcomingLimited.forEach(b => {
         const when = formatDayMonth(b._next);
         upcomingWrap.appendChild(el(`
           <div class="upcoming-card">
@@ -284,6 +273,5 @@ function setupReconfettiTriggers() {
 
   await getCount();
   await renderBirthdays();
-
   setupReconfettiTriggers();
 })();
