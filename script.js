@@ -1,11 +1,10 @@
-// ------------------ Utilities ------------------
+// ---------- Helpers ----------
 async function loadJSON(path) {
   try {
     const res = await fetch(path, { cache: "no-store" });
     if (!res.ok) return [];
     return await res.json();
-  } catch (err) {
-    console.error('loadJSON error', err);
+  } catch {
     return [];
   }
 }
@@ -16,7 +15,7 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
-// ------------------ Members ------------------
+// ---------- Members ----------
 function renderMembers(members) {
   const grid = document.getElementById("members-grid");
   if (!grid) return;
@@ -24,12 +23,12 @@ function renderMembers(members) {
 
   members.forEach(m => {
     const links = [];
-    if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank" rel="noreferrer"><i class="fa-solid fa-car"></i></a>`);
-    if (m.links?.facebook) links.push(`<a href="${m.links.facebook}" target="_blank" rel="noreferrer"><i class="fa-brands fa-facebook"></i></a>`);
-    if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank" rel="noreferrer"><i class="fa-brands fa-instagram"></i></a>`);
-    if (m.links?.email) links.push(`<a href="mailto:${m.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
+    if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank"><i class="fa-solid fa-car"></i></a>`);
+    if (m.links?.facebook)  links.push(`<a href="${m.links.facebook}"  target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
+    if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
+    if (m.links?.email)     links.push(`<a href="mailto:${m.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
-    grid.appendChild(el(`
+    const card = el(`
       <article class="item admin-card">
         <div class="row">
           ${m.avatar ? `<img class="avatar" src="${m.avatar}" alt="${m.name}">` : ""}
@@ -40,17 +39,18 @@ function renderMembers(members) {
         </div>
         ${m.bio ? `<p style="margin-top:10px">${m.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${m.tags?.length && m.tags[0] !== "" ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
+        ${Array.isArray(m.tags) && m.tags.length && m.tags[0] !== "" ? `<div class="badge">${m.tags.join(" • ")}</div>` : ""}
       </article>
-    `));
+    `);
+
+    grid.appendChild(card);
   });
 
-  // adminCount (optional)
-  const adminCountEl = document.getElementById('adminCount');
-  if (adminCountEl) adminCountEl.textContent = members.length;
+  const adminCount = document.getElementById("adminCount");
+  if (adminCount) adminCount.textContent = members.length;
 }
 
-// ------------------ Pookies ------------------
+// ---------- Pookies ----------
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
   if (!grid) return;
@@ -58,12 +58,12 @@ function renderPookies(pookies) {
 
   pookies.forEach(p => {
     const links = [];
-    if (p.links?.portfolio) links.push(`<a href="${p.links.portfolio}" target="_blank" rel="noreferrer"><i class="fa-solid fa-globe"></i></a>`);
-    if (p.links?.facebook) links.push(`<a href="${p.links.facebook}" target="_blank" rel="noreferrer"><i class="fa-brands fa-facebook"></i></a>`);
-    if (p.links?.instagram) links.push(`<a href="${p.links.instagram}" target="_blank" rel="noreferrer"><i class="fa-brands fa-instagram"></i></a>`);
-    if (p.links?.email) links.push(`<a href="mailto:${p.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
+    if (p.links?.portfolio) links.push(`<a href="${p.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
+    if (p.links?.facebook)  links.push(`<a href="${p.links.facebook}"  target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
+    if (p.links?.instagram) links.push(`<a href="${p.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
+    if (p.links?.email)     links.push(`<a href="mailto:${p.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
-    grid.appendChild(el(`
+    const card = el(`
       <article class="item pookie-card">
         <div class="row">
           ${p.avatar ? `<img class="avatar" src="${p.avatar}" alt="${p.name}">` : ""}
@@ -74,110 +74,161 @@ function renderPookies(pookies) {
         </div>
         ${p.bio ? `<p style="margin-top:10px">${p.bio}</p>` : ""}
         ${links.length ? `<div class="social-links">${links.join("")}</div>` : ""}
-        ${p.tags?.length && p.tags[0] !== "" ? `<div class="badge pookie-badge">${p.tags.join(" • ")}</div>` : ""}
+        ${Array.isArray(p.tags) && p.tags.length && p.tags[0] !== "" ? `<div class="badge pookie-badge">${p.tags.join(" • ")}</div>` : ""}
       </article>
-    `));
+    `);
+
+    grid.appendChild(card);
   });
 
-  // memberCount (optional)
-  const memberCountEl = document.getElementById('memberCount');
-  if (memberCountEl) memberCountEl.textContent = pookies.length;
+  const memberCount = document.getElementById("memberCount");
+  if (memberCount) memberCount.textContent = pookies.length;
 }
 
-// ------------------ Total Count ------------------
+// ---------- Total Count (optional badge on top) ----------
 async function getCount() {
   try {
-    const membersData = await loadJSON("/data/members.json");
-    const pookiesData = await loadJSON("/data/pookies.json");
-    const total = (membersData?.length || 0) + (pookiesData?.length || 0);
-    const elTotal = document.getElementById("totalCount");
-    if (elTotal) elTotal.textContent = total;
+    const members = await loadJSON("/data/members.json");
+    const pookies = await loadJSON("/data/pookies.json");
+    const total = (members?.length || 0) + (pookies?.length || 0);
+
+    const totalCountEl = document.getElementById("totalCount");
+    if (totalCountEl) totalCountEl.textContent = total;
   } catch (err) {
-    console.error("getCount error", err);
-    const elTotal = document.getElementById("totalCount");
-    if (elTotal) elTotal.textContent = "Error";
+    console.error("Count error:", err);
+    const totalCountEl = document.getElementById("totalCount");
+    if (totalCountEl) totalCountEl.textContent = "Error";
   }
 }
 
-// ------------------ Birthdays ------------------
+// ---------- Birthdays ----------
+function isTodayDOB(dob) {
+  const d = new Date(dob);
+  if (isNaN(d)) return false;
+  const today = new Date();
+  return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
+}
+
+function nextOccurrence(dob) {
+  const d = new Date(dob);
+  const today = new Date();
+  let next = new Date(today.getFullYear(), d.getMonth(), d.getDate());
+  if (next < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+    next.setFullYear(today.getFullYear() + 1);
+  }
+  return next;
+}
+
+function formatDayMonth(date) {
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+}
+
+function launchCardConfetti(container, ms = 5000) {
+  if (typeof confetti !== "function") return; // CDN missing guard
+
+  // make a canvas overlay inside the container (no CSS change needed)
+  const canvas = document.createElement("canvas");
+  Object.assign(canvas.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    pointerEvents: "none",
+    zIndex: "10",
+  });
+  container.style.position = container.style.position || "relative";
+  container.appendChild(canvas);
+
+  const c = confetti.create(canvas, { resize: true });
+  const end = Date.now() + ms;
+
+  (function frame() {
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 0 } });
+    c({ particleCount: 10, spread: 70, startVelocity: 35, origin: { x: 1 } });
+    if (Date.now() < end) requestAnimationFrame(frame);
+    else canvas.remove();
+  })();
+}
+
 async function renderBirthdays() {
+  const todayWrap = document.getElementById("today-birthday");
+  const upcomingWrap = document.getElementById("upcoming-birthdays");
+  if (!todayWrap || !upcomingWrap) return;
+
+  todayWrap.innerHTML = "";
+  upcomingWrap.innerHTML = "";
+
   try {
-    const birthdays = await loadJSON("/data/birthdays.json");
-    const today = new Date();
-    const todayStr = `${today.getDate()}-${today.getMonth() + 1}`;
+    const list = await loadJSON("/data/birthdays.json");
+    if (!Array.isArray(list)) return;
 
-    const todayDiv = document.getElementById("today-birthday");
-    const upcomingDiv = document.getElementById("upcoming-birthdays");
-    if (!todayDiv || !upcomingDiv) return;
+    const todays = list.filter(b => isTodayDOB(b.dob));
+    const upcoming = list
+      .filter(b => !isTodayDOB(b.dob))
+      .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
+      .sort((a, b) => a._next - b._next)
+      .slice(0, 8);
 
-    todayDiv.innerHTML = "";
-    upcomingDiv.innerHTML = "";
+    // --- Today cards (left avatar, right text, big heading, custom text) ---
+    if (todays.length === 0) {
+      todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
+    } else {
+      todays.forEach(b => {
+        const msg = b.bio && String(b.bio).trim().length
+          ? b.bio
+          : `Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.`;
 
-    // sort upcoming by next occurrence (optional)
-    const upcoming = [];
-    birthdays.forEach(b => {
-      if (!b.dob) return;
-      const bd = new Date(b.dob);
-      const bStr = `${bd.getDate()}-${bd.getMonth() + 1}`;
-      if (bStr === todayStr) {
-        // today
-        todayDiv.appendChild(el(`
+        const card = el(`
           <div class="birthday-row">
-            ${b.avatar ? `<img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">` : ""}
+            <div class="birthday-left">
+              <img class="birthday-avatar" 
+                   src="${b.avatar || ''}" 
+                   alt="${b.name}" 
+                   style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
+            </div>
             <div class="birthday-text">
-              <h3>🎉 Happy Birthday, ${b.name}! 🎉</h3>
-              <p>${b.bio ? b.bio : 'Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! - Pinky Way family.'}</p>
+              <h3 style="font-size:28px;margin:0 0 10px">🎉 Happy Birthday 🎉</h3>
+              <p style="margin:0 0 6px"><strong>${b.name}</strong></p>
+              <p style="margin:0">${msg}</p>
             </div>
           </div>
-          <canvas id="birthday-confetti"></canvas>
+        `);
+
+        todayWrap.appendChild(card);
+        launchCardConfetti(card, 5000);
+      });
+    }
+
+    // --- Upcoming mini cards ---
+    if (upcoming.length === 0) {
+      upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
+    } else {
+      upcoming.forEach(b => {
+        const when = formatDayMonth(b._next);
+        upcomingWrap.appendChild(el(`
+          <div class="upcoming-card">
+            <img class="birthday-avatar" src="${b.avatar || ''}" alt="${b.name}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;">
+            <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
+          </div>
         `));
-        // start confetti after DOM inserted
-        setTimeout(() => launchConfetti(), 120);
-      } else {
-        upcoming.push({ ...b, dateObj: bd });
-      }
-    });
-
-    // sort upcoming by next date (this year)
-    upcoming.sort((a, c) => a.dateObj - c.dateObj);
-
-    upcoming.forEach(b => {
-      const dateStr = b.dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-      upcomingDiv.appendChild(el(`
-        <div class="upcoming-card">
-          ${b.avatar ? `<img class="birthday-avatar" src="${b.avatar}" alt="${b.name}">` : ""}
-          <div><strong>${b.name}</strong><br>${dateStr}</div>
-        </div>
-      `));
-    });
-
+      });
+    }
   } catch (err) {
-    console.error("renderBirthdays error", err);
+    console.error("Birthday load error:", err);
   }
 }
 
-// Confetti
-function launchConfetti() {
-  const canvas = document.getElementById("birthday-confetti");
-  if (!canvas || typeof confetti !== "function") return;
-  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
-  myConfetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-}
-
-// ------------------ Initialize ------------------
+// ---------- Init ----------
 (async () => {
-  // set year
-  const yearEl = document.getElementById("year");
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
 
-  // load members + pookies
   const members = await loadJSON("/data/members.json");
-  renderMembers(members || []);
+  renderMembers(members);
 
   const pookies = await loadJSON("/data/pookies.json");
-  renderPookies(pookies || []);
+  renderPookies(pookies);
 
-  // counts and birthdays
-  await getCount();
+  await getCount();       // updates totalCount if exists
   await renderBirthdays();
 })();
