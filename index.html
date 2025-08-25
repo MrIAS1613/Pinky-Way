@@ -35,10 +35,17 @@
       <p>We’re a community built on good vibes only. Where pookies, friends, and kind souls gather. No toxicity, no drama! Just connection, laughter, and support for each other. A safe space to be yourself, share love and grow together.</p>
     </section>
 
+    <section id="birthday-section">
+      <h2>🎉 Birthday Celebrations 🎉</h2>
 
-<!-- Confetti Canvas -->
-<canvas id="confetti-canvas"></canvas>
-    
+      <!-- Today's Birthday -->
+      <div id="today-birthday" class="birthday-card"></div>
+
+      <!-- Upcoming Birthdays -->
+      <h3>Upcoming Birthdays</h3>
+      <div id="upcoming-birthdays" class="birthday-grid"></div>
+    </section>
+
     <section>
       <h1>Our Pookies</h1>
       <p><b>Total Number of Pookies: <span id="totalCount">0</span></b></p>
@@ -61,6 +68,9 @@
 
   <!-- Confetti lib MUST be before your script -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- Birthday audio (you can replace the src file name/path) -->
+  <audio id="birthday-audio" preload="auto" src="birthday.mp3"></audio>
 
   <!-- Your main JS -->
   <script src="script.js" defer></script>
