@@ -12,6 +12,37 @@
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
 
+  .hamburger {
+  display: none;       /* Desktop এ লুকানো */
+  font-size: 32px;     /* বড় করা */
+  cursor: pointer;
+  margin-right: 12px;  /* Brand থেকে একটু দূরে */
+}
+
+@media (max-width:640px) {
+  .hamburger {
+    display: block;
+    order: -1;         /* বাম দিকে চলে আসবে */
+  }
+
+  .links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 16px;        /* বাম দিক */
+    background: #fff7fb;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
+
+  .links.open {
+    display: flex;
+  }
+}
+  
   /* New: deeper text for birthday bio */
   --birthday-bio:#111111;
 }
