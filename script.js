@@ -317,3 +317,21 @@ function setupReconfettiTriggers() {
   await renderBirthdays();
   setupReconfettiTriggers();
 })();
+
+// Menu toggle
+const menuBtn = document.getElementById("menu-btn");
+const menuOverlay = document.getElementById("menu-overlay");
+const closeMenu = document.getElementById("close-menu");
+
+menuBtn.addEventListener("click", () => {
+  menuOverlay.style.display = "flex";
+});
+
+closeMenu.addEventListener("click", () => {
+  menuOverlay.style.display = "none";
+});
+
+// Close overlay if clicked outside menu-content
+menuOverlay.addEventListener("click", (e) => {
+  if (e.target === menuOverlay) menuOverlay.style.display = "none";
+});
