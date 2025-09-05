@@ -12,36 +12,53 @@
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
 
-  .hamburger {
-  display: none;       /* Desktop এ লুকানো */
-  font-size: 32px;     /* বড় করা */
-  cursor: pointer;
-  margin-right: 12px;  /* Brand থেকে একটু দূরে */
+/* Hamburger & Overlay Menu */
+.hamburger i { font-size: 40px; cursor:pointer; color: var(--accent); transition:.3s; }
+.hamburger:hover i { transform: scale(1.1); }
+
+.overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  display: none; flex-direction: column; justify-content:center; align-items:center;
+  z-index:1200; opacity:0; transition:opacity .3s ease;
+}
+.overlay.show { display:flex; opacity:1; }
+
+.overlay ul { list-style:none; padding:0; margin:0; text-align:center; }
+.overlay ul li { margin:24px 0; transform: translateY(50px); opacity:0; animation: slideIn 0.5s forwards; }
+.overlay ul li:nth-child(1){ animation-delay:0.05s; }
+.overlay ul li:nth-child(2){ animation-delay:0.1s; }
+.overlay ul li:nth-child(3){ animation-delay:0.15s; }
+.overlay ul li:nth-child(4){ animation-delay:0.2s; }
+.overlay ul li:nth-child(5){ animation-delay:0.25s; }
+
+@keyframes slideIn {
+  to { transform: translateY(0); opacity:1; }
 }
 
-@media (max-width:640px) {
-  .hamburger {
-    display: block;
-    order: 1;         /* বাম দিকে চলে আসবে */
-  }
-
-  .links {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 60px;
-    left: 16px;        /* বাম দিক */
-    background: #fff7fb;
-    padding: 12px;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    z-index: 100;
-  }
-
-  .links.open {
-    display: flex;
-  }
+.overlay ul li a {
+  font-size: 32px; font-weight:700; color:var(--accent); text-decoration:none; transition:.2s;
 }
+.overlay ul li a:hover { color:#ff1493; }
+
+/* Blur effect when overlay open */
+body.menu-open main, body.menu-open footer, body.menu-open header { filter: blur(6px); pointer-events:none; }
+
+/* Anonymous Messages */
+#anonymous-section form {
+  display:flex; flex-direction:column; gap:12px;
+}
+#anonymous-section input, #anonymous-section textarea {
+  padding:8px 12px; font-size:16px; border-radius:12px; border:1px solid var(--border);
+  font-family:inherit;
+}
+#anonymous-section button {
+  background: var(--accent); color:#fff; border:none; padding:12px 18px; border-radius:12px; cursor:pointer; font-size:16px;
+}
+#anonymous-section button:hover { background:#ff1493; }
+#anonMessages .item { padding:14px; border-radius:12px; background:#fff0f5; border:1px solid var(--pookie-border); }
+
   
   /* New: deeper text for birthday bio */
   --birthday-bio:#111111;
