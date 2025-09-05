@@ -2,29 +2,26 @@
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
 
-
-// Menu toggle
+// ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
 const menuOverlay = document.getElementById("menu-overlay");
 const closeMenu = document.getElementById("close-menu");
 
-menuBtn.addEventListener("click", () => {
-  menuOverlay.style.display = "flex";
-});
+function toggleMenu() {
+  if (!menuOverlay) return;
+  const isVisible = menuOverlay.style.display === "flex";
+  menuOverlay.style.display = isVisible ? "none" : "flex";
+}
 
-closeMenu.addEventListener("click", () => {
-  menuOverlay.style.display = "none";
-});
+if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
+if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
 
 // Close overlay if clicked outside menu-content
-menuOverlay.addEventListener("click", (e) => {
-  if (e.target === menuOverlay) menuOverlay.style.display = "none";
-});
-
-hamburger.addEventListener("click", toggleMenu);
-document.querySelectorAll(".overlay-link").forEach(a => {
-  a.addEventListener("click", toggleMenu);
-});
+if (menuOverlay) {
+  menuOverlay.addEventListener("click", (e) => {
+    if (e.target === menuOverlay) menuOverlay.style.display = "none";
+  });
+}
 
 // ---------- Anonymous Messages ----------
 let anonMessages = [];
@@ -33,18 +30,21 @@ const anonName = document.getElementById("anonName");
 const anonWriting = document.getElementById("anonWriting");
 const anonMessagesWrap = document.getElementById("anonMessages");
 
-anonForm.addEventListener("submit", e => {
-  e.preventDefault();
-  const name = anonName.value.trim() || "Anonymous";
-  const writing = anonWriting.value.trim();
-  if(!writing) return alert("Message required!");
-  const msg = { name, writing };
-  anonMessages.push(msg);
-  renderAnonMessages();
-  anonForm.reset();
-});
+if (anonForm) {
+  anonForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = anonName.value.trim() || "Anonymous";
+    const writing = anonWriting.value.trim();
+    if (!writing) return alert("Message required!");
+    const msg = { name, writing };
+    anonMessages.push(msg);
+    renderAnonMessages();
+    anonForm.reset();
+  });
+}
 
 function renderAnonMessages() {
+  if (!anonMessagesWrap) return;
   anonMessagesWrap.innerHTML = "";
   anonMessages.forEach(m => {
     const card = document.createElement("div");
@@ -80,7 +80,7 @@ function renderMembers(members) {
   members.forEach(m => {
     const links = [];
     if (m.links?.portfolio) links.push(`<a href="${m.links.portfolio}" target="_blank"><i class="fa-solid fa-car"></i></a>`);
-    if (m.links?.facebook)  links.push(`<a href="${m.links.facebook}"  target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
+    if (m.links?.facebook)  links.push(`<a href="${m.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (m.links?.instagram) links.push(`<a href="${m.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
     if (m.links?.email)     links.push(`<a href="mailto:${m.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
@@ -115,7 +115,7 @@ function renderPookies(pookies) {
   pookies.forEach(p => {
     const links = [];
     if (p.links?.portfolio) links.push(`<a href="${p.links.portfolio}" target="_blank"><i class="fa-solid fa-globe"></i></a>`);
-    if (p.links?.facebook)  links.push(`<a href="${p.links.facebook}"  target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
+    if (p.links?.facebook)  links.push(`<a href="${p.links.facebook}" target="_blank"><i class="fa-brands fa-facebook"></i></a>`);
     if (p.links?.instagram) links.push(`<a href="${p.links.instagram}" target="_blank"><i class="fa-brands fa-instagram"></i></a>`);
     if (p.links?.email)     links.push(`<a href="mailto:${p.links.email}"><i class="fa-solid fa-envelope"></i></a>`);
 
@@ -227,9 +227,6 @@ async function renderBirthdays() {
   const todayWrap = document.getElementById("today-birthday");
   const upcomingWrap = document.getElementById("upcoming-birthdays");
   if (!todayWrap || !upcomingWrap) return;
-
-  todayWrap.innerHTML = "";
-  upcomingWrap.innerHTML = "";
 
   try {
     const list = await loadJSON("/data/birthdays.json");
