@@ -14,36 +14,28 @@
 
 <header class="shell">
   <nav class="nav">
-    <a href="#home" class="brand" style="display:flex; align-items:center;">
-      <img src="pinky-way-logo.jpg" alt="Pinky Way Logo" style="height:40px; width:40px; border-radius:50%; object-fit:cover; margin-right:8px;">
-      <span style="font-weight:800; font-family:Poppins,Inter,sans-serif;">Pinky Way</span>
-    </a>
+  <a href="#home" class="brand" style="display:flex; align-items:center;">
+    <img src="pinky-way-logo.jpg" alt="Pinky Way Logo" style="height:40px; width:40px; border-radius:50%; object-fit:cover; margin-right:8px;">
+    <span style="font-weight:800; font-family:Poppins,Inter,sans-serif;">Pinky Way</span>
+  </a>
 
-      
-      <div class="links">
-        <a href="#home">Home</a>
-        <a href="#about">About us</a>
-        <a href="#birthday-section">Birthdays</a>
-        <a href="#members">Members</a>
-        <a href="#anonymous-section">Anonymous Messages</a>
-      </div>
+  <!-- Hamburger/Menu Icon -->
+  <button id="menu-btn" class="menu-btn"><i class="fa-solid fa-bars fa-2x"></i></button>
+</nav>
 
-      <div class="hamburger" id="hamburger-menu">
-        <i class="fa-solid fa-bars"></i>
-      </div>
-    </nav>
+<!-- Fullscreen Menu Overlay -->
+<div id="menu-overlay" class="menu-overlay">
+  <div class="menu-content">
+    <a href="#home" class="menu-link">Home</a>
+    <a href="#about" class="menu-link">About us</a>
+    <a href="#birthday-section" class="menu-link">Birthdays</a>
+    <a href="#members" class="menu-link">Members</a>
+    <a href="#anonymous-messages" class="menu-link">Anonymous Messages</a>
+    <button id="close-menu" class="close-menu">&times;</button>
+  </div>
+</div>
   </header>
 
-  <!-- Overlay Menu -->
-  <div id="overlay-menu" class="overlay">
-    <ul>
-      <li><a href="#home" class="overlay-link">Home</a></li>
-      <li><a href="#about" class="overlay-link">About us</a></li>
-      <li><a href="#birthday-section" class="overlay-link">Birthdays</a></li>
-      <li><a href="#members" class="overlay-link">Members</a></li>
-      <li><a href="#anonymous-section" class="overlay-link">Anonymous Messages</a></li>
-    </ul>
-  </div>
 
   <main class="shell">
     <section id="home" class="hero">
@@ -81,7 +73,7 @@
     <section id="anonymous-section" class="card">
       <h2>Anonymous Messages</h2>
       <form id="anonForm">
-        <label>Name (optional)</label>
+        <label>Name</label>
         <input type="text" id="anonName" placeholder="Name" maxlength="50">
         <label>Your Writings</label>
         <textarea id="anonWriting" placeholder="Write something..." maxlength="5000"></textarea>
