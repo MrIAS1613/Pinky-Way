@@ -22,7 +22,7 @@
 @media (max-width:640px) {
   .hamburger {
     display: block;
-    order: -1;         /* বাম দিকে চলে আসবে */
+    order: 1;         /* বাম দিকে চলে আসবে */
   }
 
   .links {
