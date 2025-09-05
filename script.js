@@ -1,6 +1,13 @@
 // ---------- Config ----------
-const CONFETTI_DURATION_MS = 10000; // 10s (was 5s)
+const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
+
+// ---------- Hamburger Menu ----------
+const hamburger = document.getElementById("hamburger-menu");
+const navLinks = document.getElementById("nav-links");
+hamburger?.addEventListener("click", () => {
+  navLinks.classList.toggle("open");
+});
 
 // ---------- Helpers ----------
 async function loadJSON(path) {
