@@ -2,15 +2,25 @@
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
 
-// ---------- Hamburger Menu ----------
-const hamburger = document.getElementById("hamburger-menu");
-const overlay = document.getElementById("overlay-menu");
 
-function toggleMenu() {
-  const open = overlay.classList.contains("show");
-  overlay.classList.toggle("show", !open);
-  document.body.classList.toggle("menu-open", !open);
-}
+// Menu toggle
+const menuBtn = document.getElementById("menu-btn");
+const menuOverlay = document.getElementById("menu-overlay");
+const closeMenu = document.getElementById("close-menu");
+
+menuBtn.addEventListener("click", () => {
+  menuOverlay.style.display = "flex";
+});
+
+closeMenu.addEventListener("click", () => {
+  menuOverlay.style.display = "none";
+});
+
+// Close overlay if clicked outside menu-content
+menuOverlay.addEventListener("click", (e) => {
+  if (e.target === menuOverlay) menuOverlay.style.display = "none";
+});
+
 hamburger.addEventListener("click", toggleMenu);
 document.querySelectorAll(".overlay-link").forEach(a => {
   a.addEventListener("click", toggleMenu);
@@ -317,21 +327,3 @@ function setupReconfettiTriggers() {
   await renderBirthdays();
   setupReconfettiTriggers();
 })();
-
-// Menu toggle
-const menuBtn = document.getElementById("menu-btn");
-const menuOverlay = document.getElementById("menu-overlay");
-const closeMenu = document.getElementById("close-menu");
-
-menuBtn.addEventListener("click", () => {
-  menuOverlay.style.display = "flex";
-});
-
-closeMenu.addEventListener("click", () => {
-  menuOverlay.style.display = "none";
-});
-
-// Close overlay if clicked outside menu-content
-menuOverlay.addEventListener("click", (e) => {
-  if (e.target === menuOverlay) menuOverlay.style.display = "none";
-});
