@@ -11,96 +11,90 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  
-  <!-- Navigation -->
   <header class="shell">
-  <nav class="nav">
-    <div class="hamburger" id="hamburger-menu">
-      <i class="fa-solid fa-bars"></i>
-    </div>
-    <a href="#home" class="brand">
-      <img src="pinky-way-logo.jpg" alt="Pinky Way Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
-      Pinky Way
-    </a>
-    <div class="links" id="nav-links">
-      <a href="#home">Home</a>
-      <a href="#about">About us</a>
-      <a href="#birthday-section">Birthdays</a>
-      <a href="#members">Members</a>
-      <a href="#anonymous-section">Anonymous Messages</a>
-    </div>
-  </nav>
+    <nav class="nav">
+      <a href="#home" class="brand">
+        <img src="pinky-way-logo.jpg" alt="Pinky Way Logo">
+        Pinky Way
+      </a>
+
+      <div class="links">
+        <a href="#home">Home</a>
+        <a href="#about">About us</a>
+        <a href="#birthday-section">Birthdays</a>
+        <a href="#members">Members</a>
+        <a href="#anonymous-section">Anonymous Messages</a>
+      </div>
+
+      <div class="hamburger" id="hamburger-menu">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+    </nav>
   </header>
-  
-  <!-- Hero Section -->
-  <section id="home" class="hero">
-    <h1>Hello Cuties!</h1>
-    <p class="sub">A pookie community for connection, laughter, and support.</p>
-  </section>
+
+  <!-- Overlay Menu -->
+  <div id="overlay-menu" class="overlay">
+    <ul>
+      <li><a href="#home" class="overlay-link">Home</a></li>
+      <li><a href="#about" class="overlay-link">About us</a></li>
+      <li><a href="#birthday-section" class="overlay-link">Birthdays</a></li>
+      <li><a href="#members" class="overlay-link">Members</a></li>
+      <li><a href="#anonymous-section" class="overlay-link">Anonymous Messages</a></li>
+    </ul>
+  </div>
 
   <main class="shell">
-    <!-- About -->
+    <section id="home" class="hero">
+      <h1>Hello Cuties!</h1>
+      <p class="sub">A pookie community for connection, laughter, and support.</p>
+    </section>
+
     <section id="about" class="card">
       <h2>About us</h2>
       <p>We’re a community built on good vibes only. Where pookies, friends, and kind souls gather. No toxicity, no drama! Just connection, laughter, and support for each other. A safe space to be yourself, share love and grow together.</p>
     </section>
 
-    <!-- Birthdays -->
     <section id="birthday-section">
       <h2>🎉 Birthday Celebrations 🎉</h2>
-      <!-- Today's Birthday -->
       <div id="today-birthday" class="birthday-card"></div>
-      <!-- Upcoming Birthday -->
-      <h3>Upcoming Birthday</h3>
+      <h3>Upcoming Birthdays</h3>
       <div id="upcoming-birthdays" class="birthday-grid"></div>
     </section>
 
-    <!-- Members Summary -->
     <section>
       <h1>Our Pookies</h1>
       <p><b>Total Number of Pookies: <span id="totalCount">0</span></b></p>
     </section>
 
-    <!-- Admins -->
     <section id="members">
       <h2>Admins <span id="adminCount" class="count-badge"></span></h2>
       <div id="members-grid" class="grid"></div>
     </section>
 
-    <!-- Members -->
     <section id="pookies">
       <h2>Members <span id="memberCount" class="count-badge"></span></h2>
       <div id="pookies-grid" class="grid"></div>
     </section>
 
-    <!-- Anonymous Messages -->
     <section id="anonymous-section" class="card">
       <h2>Anonymous Messages</h2>
-      <div id="anonymous-form">
-        <input type="text" id="msg-name" placeholder="Name (optional)">
-        <textarea id="msg-text" placeholder="Your Writings (max 5000 chars)" maxlength="5000"></textarea>
-        <button id="msg-submit">Submit</button>
-      </div>
-      <div id="messages-grid"></div>
+      <form id="anonForm">
+        <label>Name (optional)</label>
+        <input type="text" id="anonName" placeholder="Name" maxlength="50">
+        <label>Your Writings</label>
+        <textarea id="anonWriting" placeholder="Write something..." maxlength="5000"></textarea>
+        <button type="submit">Submit</button>
+      </form>
+      <div id="anonMessages" class="grid"></div>
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="shell foot">
     <p>© <span id="year"></span> Pinky Way • All rights are reserved •</p>
   </footer>
 
-  <!-- Confetti lib -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- Birthday audio -->
   <audio id="birthday-audio" preload="auto" src="birthday.mp3"></audio>
-
-  <!-- Main JS -->
   <script src="script.js" defer></script>
 </body>
 </html>
