@@ -4,11 +4,45 @@ const BIRTHDAY_AUDIO_ID = "birthday-audio";
 
 // ---------- Hamburger Menu ----------
 const hamburger = document.getElementById("hamburger-menu");
-const navLinks = document.getElementById("nav-links");
+const overlay = document.getElementById("overlay-menu");
 
-hamburger?.addEventListener("click", () => {
-  navLinks.classList.toggle("open");
+function toggleMenu() {
+  const open = overlay.classList.contains("show");
+  overlay.classList.toggle("show", !open);
+  document.body.classList.toggle("menu-open", !open);
+}
+hamburger.addEventListener("click", toggleMenu);
+document.querySelectorAll(".overlay-link").forEach(a => {
+  a.addEventListener("click", toggleMenu);
 });
+
+// ---------- Anonymous Messages ----------
+let anonMessages = [];
+const anonForm = document.getElementById("anonForm");
+const anonName = document.getElementById("anonName");
+const anonWriting = document.getElementById("anonWriting");
+const anonMessagesWrap = document.getElementById("anonMessages");
+
+anonForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const name = anonName.value.trim() || "Anonymous";
+  const writing = anonWriting.value.trim();
+  if(!writing) return alert("Message required!");
+  const msg = { name, writing };
+  anonMessages.push(msg);
+  renderAnonMessages();
+  anonForm.reset();
+});
+
+function renderAnonMessages() {
+  anonMessagesWrap.innerHTML = "";
+  anonMessages.forEach(m => {
+    const card = document.createElement("div");
+    card.classList.add("item");
+    card.innerHTML = `<p>${m.writing}</p>`;
+    anonMessagesWrap.appendChild(card);
+  });
+}
 
 // ---------- Helpers ----------
 async function loadJSON(path) {
