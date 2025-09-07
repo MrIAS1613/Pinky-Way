@@ -11,6 +11,13 @@
 
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
+  
+@media (max-width: 600px) {
+  section {
+    margin: 40px 0;
+    padding: 15px;
+  }
+}
 
   section {
   margin: 40px 0;   /* প্রতিটা section এর উপরে-নিচে 60px space */
