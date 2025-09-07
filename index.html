@@ -70,18 +70,33 @@
       <div id="pookies-grid" class="grid"></div>
     </section>
 
-    <section id="anonymous-section" class="card">
-      <h2>Anonymous Messages</h2>
-      <form id="anonForm">
-        <label>Name</label>
-        <input type="text" id="anonName" placeholder="Name" maxlength="50">
-        <label>Your Writings</label>
-        <textarea id="anonWriting" placeholder="Write something..." maxlength="5000"></textarea>
-        <button type="submit">Submit</button>
-      </form>
-      <div id="anonMessages" class="grid"></div>
-    </section>
-  </main>
+   <section id="anonymous-section" class="card">
+  <h2>Anonymous Messages</h2>
+  <form id="anonForm">
+    <label>Name</label>
+    <input type="text" id="anonName" placeholder="Name" maxlength="50">
+    <label>Your Writings</label>
+    <textarea id="anonWriting" placeholder="Write something..." maxlength="5000"></textarea>
+    <button type="submit">Submit</button>
+  </form>
+
+  <!-- See all button -->
+  <button id="seeAnonBtn" class="see-anon-btn">See All Anonymous Messages</button>
+
+  <!-- Hidden container -->
+  <div id="anonMessagesWrapper" class="hidden">
+    <div id="anonMessages" class="grid"></div>
+  </div>
+</section>
+
+<!-- Fullscreen message modal -->
+<div id="messageModal" class="modal hidden">
+  <div class="modal-content">
+    <button id="closeModal" class="close-modal">&times;</button>
+    <div id="fullMessageText"></div>
+  </div>
+</div>
+
 
   <footer class="shell foot">
     <p>© <span id="year"></span> Pinky Way • All rights are reserved •</p>
