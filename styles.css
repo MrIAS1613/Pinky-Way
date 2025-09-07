@@ -88,13 +88,20 @@ section.card{
   transition: color .2s ease, transform .1s ease;
   text-decoration: none;
   vertical-align: middle;
+  margin-right: 8px; /* spacing between icons */
+}
+
+.social-links a:last-child,
+.socials a:last-child {
+  margin-right: 0; /* no extra space after last icon */
 }
 
 .social-links a:hover,
 .socials a:hover {
-  color: #ff1493; /* stay pink on hover */
+  color: #ff1493;
   transform: translateY(-1px);
 }
+
 
 /* Buttons */
 .see-anon-btn{background:none;border:none;color:#e91e63;font-weight:bold;text-decoration:underline;cursor:pointer;margin-top:10px;}
