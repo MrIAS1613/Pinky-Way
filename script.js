@@ -17,94 +17,10 @@ function toggleMenu() {
 if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
 if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
 
+// Close overlay if clicked outside menu-content
 if (menuOverlay) {
   menuOverlay.addEventListener("click", (e) => {
     if (e.target === menuOverlay) menuOverlay.style.display = "none";
-  });
-}
-
-// ---------- Anonymous Messages ----------
-let anonMessages = [];
-const anonForm = document.getElementById("anonForm");
-const anonName = document.getElementById("anonName");
-const anonWriting = document.getElementById("anonWriting");
-const anonMessagesWrap = document.getElementById("anonMessages");
-const seeAllBtn = document.getElementById("seeAllAnon");
-
-// submit new message
-if (anonForm) {
-  anonForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const name = anonName.value.trim() || "Anonymous";
-    const message = anonWriting.value.trim();
-    if (!message) return alert("Message required!");
-
-    try {
-      const res = await fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, message })
-      });
-      const json = await res.json();
-      if (json.status === "success") {
-        anonMessages.push({ name, message });
-        renderAnonMessages();
-        anonForm.reset();
-        alert("Message submitted!");
-      }
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Failed to submit message.");
-    }
-  });
-}
-
-// fetch messages from Google Sheet
-async function fetchAnonMessages() {
-  try {
-    const res = await fetch(GOOGLE_SHEET_URL);
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      anonMessages = data.reverse(); // newest first
-      renderAnonMessages();
-    }
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
-}
-
-// render preview & full message on click
-function renderAnonMessages(showAll = false) {
-  if (!anonMessagesWrap) return;
-  anonMessagesWrap.innerHTML = "";
-
-  anonMessages.forEach((m, index) => {
-    const preview = m.message.length > 20 ? m.message.substring(0, 20) + "..." : m.message;
-    const card = document.createElement("div");
-    card.classList.add("item", "anon-card");
-    card.innerHTML = `
-      <p class="anon-preview">${preview}</p>
-      <p class="anon-full" style="display:none;white-space:pre-wrap;">${m.message}</p>
-    `;
-    card.addEventListener("click", () => {
-      const full = card.querySelector(".anon-full");
-      const prev = card.querySelector(".anon-preview");
-      if (full.style.display === "none") {
-        full.style.display = "block";
-        prev.style.display = "none";
-      } else {
-        full.style.display = "none";
-        prev.style.display = "block";
-      }
-    });
-    anonMessagesWrap.appendChild(card);
-  });
-}
-
-// see all messages button
-if (seeAllBtn) {
-  seeAllBtn.addEventListener("click", async () => {
-    await fetchAnonMessages();
   });
 }
 
@@ -159,6 +75,7 @@ function renderMembers(members) {
   const adminCount = document.getElementById("adminCount");
   if (adminCount) adminCount.textContent = members.length;
 }
+
 // ---------- Pookies ----------
 function renderPookies(pookies) {
   const grid = document.getElementById("pookies-grid");
@@ -251,6 +168,68 @@ async function playBirthdayAudio() {
     await audio.play();
   } catch (e) {}
 }
+// ---------- Anonymous Messages (Google Sheet) ----------
+let anonMessages = [];
+const anonMessagesWrap = document.getElementById("anonMessages");
+const seeAllBtn = document.getElementById("seeAllAnonBtn"); // Button below section
+const anonOverlay = document.getElementById("anonOverlay"); // Full overlay div
+const anonOverlayContent = document.getElementById("anonOverlayContent"); // Inner content div
+
+// Fetch messages from Google Sheet
+async function fetchAnonMessages() {
+  try {
+    const res = await fetch(GOOGLE_SHEET_URL);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data.reverse() : [];
+  } catch (err) {
+    console.error("Anonymous messages fetch error:", err);
+    return [];
+  }
+}
+
+// Render messages as cards (first 20 lines preview)
+function renderAnonMessages() {
+  if (!anonMessagesWrap) return;
+  anonMessagesWrap.innerHTML = "";
+
+  anonMessages.forEach((msg, idx) => {
+    const card = document.createElement("div");
+    card.classList.add("item", "anon-card");
+    const preview = msg.message.split("\n").slice(0, 20).join("\n");
+    card.innerHTML = `<p>${preview}</p>`;
+    card.addEventListener("click", () => openAnonOverlay(idx));
+    anonMessagesWrap.appendChild(card);
+  });
+}
+
+// Open overlay with full message
+function openAnonOverlay(idx) {
+  if (!anonOverlay || !anonOverlayContent) return;
+  const msg = anonMessages[idx];
+  anonOverlayContent.innerHTML = `
+    <div style="background:#ffd3e8;padding:20px;border-radius:16px;max-height:80vh;overflow-y:auto;">
+      <p>${msg.message.replace(/\n/g, "<br>")}</p>
+    </div>
+  `;
+  anonOverlay.style.display = "flex";
+}
+
+// Close overlay
+if (anonOverlay) {
+  anonOverlay.addEventListener("click", (e) => {
+    if (e.target === anonOverlay) anonOverlay.style.display = "none";
+  });
+}
+
+// "See All Anonymous Messages" button click
+if (seeAllBtn) {
+  seeAllBtn.addEventListener("click", async () => {
+    seeAllBtn.style.display = "none"; // hide button after clicked
+    anonMessages = await fetchAnonMessages();
+    renderAnonMessages();
+  });
+}
 
 // ---------- Birthdays ----------
 function isTodayDOB(dob) {
@@ -302,10 +281,7 @@ async function renderBirthdays() {
         const card = el(`
           <div class="birthday-row">
             <div class="birthday-left">
-              <img class="birthday-avatar" 
-                   src="${b.avatar || ''}" 
-                   alt="${b.name}" 
-                   style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
+              <img class="birthday-avatar" src="${b.avatar || ''}" alt="${b.name}" style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
             </div>
             <div class="birthday-text">
               <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
@@ -347,12 +323,10 @@ async function renderBirthdays() {
 function setupReconfettiTriggers() {
   const section = document.getElementById("birthday-section");
   if (!section) return;
-
   const retrigger = () => {
     launchCardConfetti(section, CONFETTI_DURATION_MS);
     playBirthdayAudio();
   };
-
   ["pointerdown", "click", "touchstart"].forEach(evt => {
     section.addEventListener(evt, retrigger, { passive: true });
   });
@@ -372,7 +346,4 @@ function setupReconfettiTriggers() {
   await getCount();
   await renderBirthdays();
   setupReconfettiTriggers();
-
-  // fetch anonymous messages from Google Sheet on load
-  await fetchAnonMessages();
 })();
