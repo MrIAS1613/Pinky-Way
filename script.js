@@ -1,7 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwGcTuNZwziMkVSPvs2QVJbyA9f_BBCPPV9i0wh5SOH2f_Y2ZE7PaQuDtMFV0Z/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwGcTuNZwCZDdwziMkVSPvs2QVJbyA9f_BBCPPV9i0wh5SOH2f_Y2ZE7PaQuDtMFV0Z/exec";
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
@@ -125,7 +125,6 @@ async function getCount() {
     if (totalCountEl) totalCountEl.textContent = "Error";
   }
 }
-
 // ---------- Confetti + Audio ----------
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   if (typeof confetti !== "function" || !container) return;
@@ -139,9 +138,7 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
     pointerEvents: "none",
     zIndex: "10",
   });
-  if (getComputedStyle(container).position === "static") {
-    container.style.position = "relative";
-  }
+  if (getComputedStyle(container).position === "static") container.style.position = "relative";
   container.appendChild(canvas);
 
   const c = confetti.create(canvas, { resize: true });
@@ -155,19 +152,14 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   })();
 }
 
-function getBirthdayAudio() {
-  return document.getElementById(BIRTHDAY_AUDIO_ID);
-}
-
+function getBirthdayAudio() { return document.getElementById(BIRTHDAY_AUDIO_ID); }
 async function playBirthdayAudio() {
   const audio = getBirthdayAudio();
   if (!audio) return;
-  try {
-    audio.currentTime = 0;
-    await audio.play();
-  } catch (e) {}
+  try { audio.currentTime = 0; await audio.play(); } catch (e) {}
 }
-// ---------- Anonymous Messages (Google Sheet) ----------
+
+// ---------- Anonymous Messages ----------
 let anonMessages = [];
 const anonMessagesWrap = document.getElementById("anonMessages");
 const seeAllBtn = document.getElementById("seeAnonBtn");
@@ -176,7 +168,7 @@ const messageModal = document.getElementById("messageModal");
 const fullMessageText = document.getElementById("fullMessageText");
 const closeModal = document.getElementById("closeModal");
 
-// Fetch messages from Google Sheet
+// Fetch messages
 async function fetchAnonMessages() {
   try {
     const res = await fetch(GOOGLE_SHEET_URL);
@@ -189,14 +181,14 @@ async function fetchAnonMessages() {
   }
 }
 
-// Render messages as cards (preview first 20 lines)
+// Render messages
 function renderAnonMessages() {
   if (!anonMessagesWrap) return;
   anonMessagesWrap.innerHTML = "";
 
   anonMessages.forEach((msg, idx) => {
     const card = document.createElement("div");
-    card.classList.add("item", "anon-card");
+    card.classList.add("item", "card");
     const preview = msg.message.split("\n").slice(0, 20).join("\n");
     card.innerHTML = `<p>${preview}</p>`;
     card.addEventListener("click", () => openMessageModal(idx));
@@ -204,7 +196,7 @@ function renderAnonMessages() {
   });
 }
 
-// Open modal for full message
+// Modal open/close
 function openMessageModal(idx) {
   if (!messageModal || !fullMessageText) return;
   const msg = anonMessages[idx];
@@ -214,28 +206,24 @@ function openMessageModal(idx) {
     </div>
   `;
   messageModal.classList.remove("hidden");
-  document.body.style.filter = "blur(5px)"; // blur background
+  document.body.classList.add("blurred");
 }
+if (closeModal) closeModal.addEventListener("click", () => {
+  messageModal.classList.add("hidden");
+  document.body.classList.remove("blurred");
+});
 
-// Close modal
-if (closeModal) {
-  closeModal.addEventListener("click", () => {
-    messageModal.classList.add("hidden");
-    document.body.style.filter = "none";
-  });
-}
-
-// "See All Anonymous Messages" button
+// "See All" button
 if (seeAllBtn) {
   seeAllBtn.addEventListener("click", async () => {
     seeAllBtn.style.display = "none";
-    anonMessagesWrapper.classList.remove("hidden");
     anonMessages = await fetchAnonMessages();
+    anonMessagesWrapper.classList.remove("hidden");
     renderAnonMessages();
   });
 }
 
-// Handle form submission
+// Form submission
 const anonForm = document.getElementById("anonForm");
 if (anonForm) {
   anonForm.addEventListener("submit", async (e) => {
@@ -245,11 +233,16 @@ if (anonForm) {
     if (!message) return alert("Please write a message.");
 
     try {
+      // Use URLSearchParams to match Google Sheets Web App expected format
+      const payload = new URLSearchParams();
+      payload.append("name", name);
+      payload.append("message", message);
+
       await fetch(GOOGLE_SHEET_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, message })
+        body: payload
       });
+
       alert("Message submitted!");
       anonForm.reset();
       if (!anonMessagesWrapper.classList.contains("hidden")) {
@@ -265,8 +258,7 @@ if (anonForm) {
 
 // ---------- Birthdays ----------
 function isTodayDOB(dob) {
-  const d = new Date(dob);
-  if (isNaN(d)) return false;
+  const d = new Date(dob); if (isNaN(d)) return false;
   const today = new Date();
   return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
 }
@@ -300,12 +292,12 @@ async function renderBirthdays() {
     const upcoming = list
       .filter(b => b.dob && !isTodayDOB(b.dob))
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
-      .sort((a, b) => a._next - b._next);
+      .sort((a,b)=>a._next-b._next);
 
-    if (todays.length === 0) {
+    if (todays.length===0) {
       todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     } else {
-      todays.forEach(b => {
+      todays.forEach(b=>{
         const msg = b.bio && String(b.bio).trim().length
           ? b.bio
           : `Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.`;
@@ -313,7 +305,7 @@ async function renderBirthdays() {
         const card = el(`
           <div class="birthday-row">
             <div class="birthday-left">
-              <img class="birthday-avatar" src="${b.avatar || ''}" alt="${b.name}" style="width:140px;height:140px;object-fit:cover;border-radius:16px;border:3px solid #ff80ab;">
+              <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
             </div>
             <div class="birthday-text">
               <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
@@ -322,60 +314,42 @@ async function renderBirthdays() {
             </div>
           </div>
         `);
-
         todayWrap.appendChild(card);
         launchCardConfetti(card, CONFETTI_DURATION_MS);
-        if (!birthdayAudioStarted) {
-          playBirthdayAudio();
-          birthdayAudioStarted = true;
-        }
+        if(!birthdayAudioStarted){playBirthdayAudio(); birthdayAudioStarted=true;}
       });
     }
 
-    const upcomingLimited = upcoming.slice(0, 1);
-    if (upcomingLimited.length === 0) {
+    const upcomingLimited = upcoming.slice(0,1);
+    if(upcomingLimited.length===0){
       upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
-    } else {
-      upcomingLimited.forEach(b => {
-        const when = formatDayMonth(b._next);
+    }else{
+      upcomingLimited.forEach(b=>{
+        const when=formatDayMonth(b._next);
         upcomingWrap.appendChild(el(`
           <div class="upcoming-card">
-            <img class="birthday-avatar" src="${b.avatar || ''}" alt="${b.name}" style="width:54px;height:54px;border-radius:50%;object-fit:cover;">
+            <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
             <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
           </div>
         `));
       });
     }
-  } catch (err) {
-    console.error("Birthday load error:", err);
-  }
+  } catch(err){console.error("Birthday load error:",err);}
 }
 
-// ---------- Re-confetti on touch/click ----------
-function setupReconfettiTriggers() {
-  const section = document.getElementById("birthday-section");
-  if (!section) return;
-  const retrigger = () => {
-    launchCardConfetti(section, CONFETTI_DURATION_MS);
-    playBirthdayAudio();
-  };
-  ["pointerdown", "click", "touchstart"].forEach(evt => {
-    section.addEventListener(evt, retrigger, { passive: true });
-  });
+// ---------- Re-confetti ----------
+function setupReconfettiTriggers(){
+  const section=document.getElementById("birthday-section");
+  if(!section) return;
+  const retrigger=()=>{launchCardConfetti(section,CONFETTI_DURATION_MS);playBirthdayAudio();}
+  ["pointerdown","click","touchstart"].forEach(evt=>{section.addEventListener(evt,retrigger,{passive:true})});
 }
 
 // ---------- Init ----------
-(async () => {
-  const y = document.getElementById("year");
-  if (y) y.textContent = new Date().getFullYear();
+(async()=>{
+  const y=document.getElementById("year"); if(y) y.textContent=new Date().getFullYear();
 
-  const members = await loadJSON("/data/members.json");
-  renderMembers(members);
-
-  const pookies = await loadJSON("/data/pookies.json");
-  renderPookies(pookies);
-
-  await getCount();
-  await renderBirthdays();
-  setupReconfettiTriggers();
+  const members=await loadJSON("/data/members.json"); renderMembers(members);
+  const pookies=await loadJSON("/data/pookies.json"); renderPookies(pookies);
+  await getCount(); await renderBirthdays(); setupReconfettiTriggers();
 })();
