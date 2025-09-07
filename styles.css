@@ -82,8 +82,19 @@ section.card{
 
 /* Footer */
 .foot{display:flex;align-items:center;justify-content:space-between;color:var(--muted);padding:24px 16px;}
-.socials a{color:var(--muted);text-decoration:none;margin-left:14px;}
-.socials a:hover{color:var(--text);}
+.social-links a,
+.socials a {
+  color: #ff1493; /* bright pink */
+  transition: color .2s ease, transform .1s ease;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.social-links a:hover,
+.socials a:hover {
+  color: #ff1493; /* stay pink on hover */
+  transform: translateY(-1px);
+}
 
 /* Buttons */
 .see-anon-btn{background:none;border:none;color:#e91e63;font-weight:bold;text-decoration:underline;cursor:pointer;margin-top:10px;}
