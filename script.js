@@ -1,6 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxqfULqMwo4xuvGHS_rf2si7HutBK96kmP_p42KTEdqhqPs8wcDhyx1dkgWDDexaZpq/exec";
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
@@ -47,9 +48,11 @@ function renderAnonMessages() {
   if (!anonMessagesWrap) return;
   anonMessagesWrap.innerHTML = "";
   anonMessages.forEach(m => {
+    // preview first 20 characters, supporting Bangla and English
+    let preview = m.writing.slice(0, 20);
     const card = document.createElement("div");
-    card.classList.add("item");
-    card.innerHTML = `<p>${m.writing}</p>`;
+    card.classList.add("card");
+    card.textContent = preview;
     anonMessagesWrap.appendChild(card);
   });
 }
@@ -140,7 +143,6 @@ function renderPookies(pookies) {
   const memberCount = document.getElementById("memberCount");
   if (memberCount) memberCount.textContent = pookies.length;
 }
-
 // ---------- Total Count ----------
 async function getCount() {
   try {
@@ -238,7 +240,6 @@ async function renderBirthdays() {
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
       .sort((a, b) => a._next - b._next);
 
-    // --- Today cards ---
     if (todays.length === 0) {
       todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     } else {
@@ -265,7 +266,6 @@ async function renderBirthdays() {
 
         todayWrap.appendChild(card);
 
-        // Only today triggers confetti + audio
         launchCardConfetti(card, CONFETTI_DURATION_MS);
         if (!birthdayAudioStarted) {
           playBirthdayAudio();
@@ -274,7 +274,6 @@ async function renderBirthdays() {
       });
     }
 
-    // --- Upcoming mini card (only 1) ---
     const upcomingLimited = upcoming.slice(0, 1);
     if (upcomingLimited.length === 0) {
       upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
@@ -309,6 +308,25 @@ function setupReconfettiTriggers() {
   });
 }
 
+// ---------- Fetch Anonymous Messages from Google Sheets ----------
+async function fetchAnonMessagesFromSheet() {
+  if (!GOOGLE_SHEET_URL) return;
+
+  try {
+    const res = await fetch(GOOGLE_SHEET_URL, { cache: "no-store" });
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      anonMessages = data.map(row => ({
+        name: row.name || "Anonymous",
+        writing: row.message || ""
+      }));
+      renderAnonMessages();
+    }
+  } catch (err) {
+    console.error("Google Sheet fetch error:", err);
+  }
+}
+
 // ---------- Init ----------
 (async () => {
   const y = document.getElementById("year");
@@ -323,4 +341,5 @@ function setupReconfettiTriggers() {
   await getCount();
   await renderBirthdays();
   setupReconfettiTriggers();
+  await fetchAnonMessagesFromSheet();
 })();
