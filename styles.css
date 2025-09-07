@@ -12,6 +12,20 @@
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
 
+  section {
+  margin: 60px 0;   /* প্রতিটা section এর উপরে-নিচে 60px space */
+  padding: 20px;    /* ভিতরে একটু padding */
+}
+
+section.card {
+  margin: 60px 0;
+  padding: 30px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+
 /* Hamburger & Overlay Menu */
 .hamburger i { font-size: 40px; cursor:pointer; color: var(--accent); transition:.3s; }
 .hamburger:hover i { transform: scale(1.1); }
