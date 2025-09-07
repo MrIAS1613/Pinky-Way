@@ -13,8 +13,8 @@
   --pookie-border:#f9c5d1;
 
   section {
-  margin: 60px 0;   /* প্রতিটা section এর উপরে-নিচে 60px space */
-  padding: 20px;    /* ভিতরে একটু padding */
+  margin: 40px 0;   /* প্রতিটা section এর উপরে-নিচে 60px space */
+  padding: 10px;    /* ভিতরে একটু padding */
 }
 
 section.card {
