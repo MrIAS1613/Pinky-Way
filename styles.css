@@ -3,111 +3,18 @@
   --card:#ffffff;
   --muted:#6b7280;
   --text:#27272a;
-  --accent:#ff80ab;    
-  --accent-2:#f9c5d1;   
+  --accent:#ff80ab;
+  --accent-2:#f9c5d1;
   --ring:#ffd1e0;
   --border:#f1d6e0;
-  --shadow: 0 10px 30px rgba(255,128,171,.15);
+  --shadow:0 10px 30px rgba(255,128,171,.15);
 
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
-  
-@media (max-width: 600px) {
-  section {
-    margin: 40px 0;
-    padding: 15px;
-  }
-}
-
-  section {
-  margin: 40px 0;   /* প্রতিটা section এর উপরে-নিচে 60px space */
-  padding: 10px;    /* ভিতরে একটু padding */
-}
-
-section.card {
-  margin: 40px 0;
-  padding: 20px;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-
-/* Hamburger & Overlay Menu */
-.hamburger i { font-size: 40px; cursor:pointer; color: var(--accent); transition:.3s; }
-.hamburger:hover i { transform: scale(1.1); }
-
-/* Menu overlay */
-.menu-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 247, 251, 0.95);
-  backdrop-filter: blur(10px);
-  display: none;
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-}
-
-.menu-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-}
-
-.menu-link {
-  text-decoration: none;
-  color: var(--text);
-  transition: color 0.2s ease, transform 0.1s ease;
-}
-
-.menu-link:hover {
-  color: var(--accent);
-  transform: translateY(-3px);
-}
-
-.close-menu {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 48px;
-  background: none;
-  border: none;
-  color: var(--accent);
-  cursor: pointer;
-}
-
-.menu-btn {
-  background: none;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-}
-
-/* Anonymous Messages */
-#anonymous-section form {
-  display:flex; flex-direction:column; gap:12px;
-}
-#anonymous-section input, #anonymous-section textarea {
-  padding:8px 12px; font-size:16px; border-radius:12px; border:1px solid var(--border);
-  font-family:inherit;
-}
-#anonymous-section button {
-  background: var(--accent); color:#fff; border:none; padding:12px 18px; border-radius:12px; cursor:pointer; font-size:16px;
-}
-#anonymous-section button:hover { background:#ff1493; }
-#anonMessages .item { padding:14px; border-radius:12px; background:#fff0f5; border:1px solid var(--pookie-border); }
-
-  
-  /* New: deeper text for birthday bio */
   --birthday-bio:#111111;
 }
 
+/* General Layout */
 *{box-sizing:border-box;}
 body{
   margin:0;
@@ -118,13 +25,20 @@ body{
     radial-gradient(1000px 500px at 110% 0%, rgba(249,197,209,.20), transparent 60%),
     var(--bg);
 }
-
 .shell{max-width:1040px;margin:0 auto;padding:16px;}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
-.brand{font-family:Poppins,Inter,sans-serif;font-weight:800;letter-spacing:.3px;text-decoration:none;color:var(--text);}
-.links a{color:var(--muted);text-decoration:none;margin-left:14px;}
-.links a:hover{color:var(--text);}
+section{margin:40px 0;padding:10px;}
+@media (max-width:600px){section{margin:40px 0;padding:15px;}}
 
+/* Cards */
+section.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* Hero */
 .hero{
   padding:72px 18px;
   text-align:center;
@@ -135,220 +49,108 @@ body{
 }
 .hero h1{font-family:Poppins,Inter,sans-serif;font-size:40px;margin:0 0 12px;letter-spacing:.2px;}
 .sub{color:var(--muted);margin:0 0 24px;}
-h2{margin:28px 0 12px;font-family:Poppins,Inter,sans-serif;}
-.card{
-  background:var(--card);
-  padding:18px;
-  border-radius:18px;
-  border:1px solid var(--border);
-  box-shadow: var(--shadow);
-}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:10px;}
-.item{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:16px;
-  transition:transform .12s ease, box-shadow .12s ease,border-color .12s ease;
+/* Navigation */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
+.brand{font-family:Poppins,Inter,sans-serif;font-weight:800;letter-spacing:.3px;text-decoration:none;color:var(--text);}
+.menu-btn{background:none;border:none;color:var(--text);cursor:pointer;}
+.menu-overlay{
+  position:fixed;inset:0;
+  background: rgba(255, 247, 251, 0.95);
+  backdrop-filter: blur(10px);
+  display:none;
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
 }
+.menu-content{display:flex;flex-direction:column;gap:24px;text-align:center;font-size:32px;font-weight:700;}
+.menu-link{text-decoration:none;color:var(--text);transition:color 0.2s ease, transform 0.1s ease;}
+.menu-link:hover{color:var(--accent);transform:translateY(-3px);}
+.close-menu{position:absolute;top:20px;right:20px;font-size:48px;background:none;border:none;color:var(--accent);cursor:pointer;}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:10px;}
+.item{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;transition:transform .12s ease, box-shadow .12s ease,border-color .12s ease;}
 .item:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--ring);}
 .item h3{margin:0 0 6px;font-size:18px;}
 .item p{margin:0;color:var(--muted);font-size:14px;}
-.item a{color:var(--accent);text-decoration:none;font-weight:600;font-size:14px;}
 .badge{display:inline-block;font-size:12px;color:#5b2240;background:var(--accent-2);padding:4px 8px;border-radius:999px;margin-top:8px;}
 
-.avatar{
-  width:44px;height:44px;border-radius:999px;object-fit:cover;margin-right:10px;border:2px solid var(--ring);
-  background:#ffe9f1;
-}
+/* Avatar & Row */
+.avatar{width:44px;height:44px;border-radius:999px;object-fit:cover;margin-right:10px;border:2px solid var(--ring);background:#ffe9f1;}
 .row{display:flex;align-items:center;}
 
+/* Footer */
 .foot{display:flex;align-items:center;justify-content:space-between;color:var(--muted);padding:24px 16px;}
 .socials a{color:var(--muted);text-decoration:none;margin-left:14px;}
 .socials a:hover{color:var(--text);}
 
+/* Buttons */
+.see-anon-btn{background:none;border:none;color:#e91e63;font-weight:bold;text-decoration:underline;cursor:pointer;margin-top:10px;}
+
+/* Anonymous Messages Form & Cards */
+#anonymous-section form{display:flex;flex-direction:column;gap:12px;}
+#anonymous-section input,#anonymous-section textarea{padding:8px 12px;font-size:16px;border-radius:12px;border:1px solid var(--border);font-family:inherit;}
+#anonymous-section button{background:var(--accent);color:#fff;border:none;padding:12px 18px;border-radius:12px;cursor:pointer;font-size:16px;}
+#anonymous-section button:hover{background:#ff1493;}
+#anonMessages .card{
+  background: linear-gradient(120deg,#ffe0f0,#fff0f5);
+  border:2px solid #ff80ab;
+  border-radius:18px;
+  padding:16px;
+  margin:10px 0;
+  box-shadow:0 8px 18px rgba(255,128,171,0.2);
+  cursor:pointer;
+  transition:transform 0.15s ease,box-shadow 0.15s ease;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-family:'Poppins',sans-serif;
+  font-size:16px;
+  color:#6b7280;
+}
+#anonMessages .card:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,128,171,0.3);border-color:#ff1493;color:#27272a;}
+
+/* Modal */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.modal.hidden{display:none;}
+.modal-content{
+  background:#fff0f6 url('letter-paper.png') no-repeat center/cover;
+  padding:24px;
+  border-radius:16px;
+  width:90%;
+  max-width:520px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+  font-family:'Poppins',sans-serif;
+  font-size:18px;
+  line-height:1.6;
+  color:#27272a;
+  position:relative;
+  word-break:break-word;
+  max-height:80vh;
+  overflow-y:auto;
+}
+.modal-content::-webkit-scrollbar{width:6px;}
+.modal-content::-webkit-scrollbar-thumb{background:#ff80ab;border-radius:3px;}
+.close-modal{background:none;border:none;font-size:28px;position:absolute;top:10px;right:15px;cursor:pointer;color:#e91e63;}
+body.blurred>*:not(.modal){filter:blur(6px);pointer-events:none;}
+
+/* Birthday Section */
+#birthday-section{margin-top:32px;padding:12px;}
+.birthday-card,.birthday-grid{display:flex;flex-direction:column;gap:12px;}
+.birthday-row{display:flex;align-items:center;gap:16px;padding:14px;border-radius:14px;background:linear-gradient(120deg,#ffe0f0,#fff0f5);box-shadow:0 6px 18px rgba(255,128,171,0.18);position:relative;}
+.birthday-avatar{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #ff80ab;}
+.birthday-text h3{margin:0 0 6px;font-size:20px;color:#ff4081;}
+.birthday-text p{margin:0;color:#6b7280;line-height:1.4;}
+.birthday-bio{color:var(--birthday-bio) !important;}
+.birthday-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px;}
+.upcoming-card{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#fff0f5;border:1px solid var(--pookie-border);box-shadow:0 3px 10px rgba(0,0,0,0.05);}
+.upcoming-card img{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #ffd1e0;}
+
+/* Responsive */
 @media (max-width:640px){
   .links{display:none;}
   .hero h1{font-size:32px;}
-}
-
-.social-links a {
-  margin: 0 6px;
-  font-size: 18px;          
-  color: var(--accent);      
-  transition: color .2s ease, transform .1s ease;
-  text-decoration: none;
-  vertical-align: middle;
-}
-.social-links a:hover { color: #ff1493; transform: translateY(-1px); }
-.item .social-links { margin-top: 10px; }
-
-.admin-card { border: 2px solid var(--accent); }
-.pookie-card { border: 2px solid var(--pookie-border); }
-/* Note: keeping existing styles intact; no changes to pookie-badge rules */
-
-.pookie-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,192,203,0.3); }
-
-.count-badge {
-  background: black;
-  color: pink;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 14px;
-  margin-left: 6px;
-}
-
-/* Birthday section */
-#birthday-section { margin-top:32px; padding:12px }
-.birthday-card, .birthday-grid { display:flex; flex-direction:column; gap:12px; }
-.birthday-row {
-  display:flex; align-items:center; gap:16px; padding:14px; border-radius:14px;
-  background: linear-gradient(120deg, #ffe0f0, #fff0f5);
-  box-shadow:0 6px 18px rgba(255,128,171,0.18); position:relative;
-}
-.birthday-avatar{ width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid #ff80ab; }
-.birthday-text h3{ margin:0 0 6px; font-size:20px; color:#ff4081 }
-.birthday-text p{ margin:0; color:#6b7280; line-height:1.4 }
-
-/* New: darker color for the custom bio line only */
-.birthday-bio { color: var(--birthday-bio) !important; }
-
-/* upcoming */
-.birthday-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:12px; }
-.upcoming-card{ display:flex; gap:10px; align-items:center; padding:10px; border-radius:12px; background:#fff0f5; border:1px solid var(--pookie-border); box-shadow:0 3px 10px rgba(0,0,0,0.05) }
-.upcoming-card img{ width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #ffd1e0 }
-
-/* confetti canvas */
-#birthday-confetti{ position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1000 }
-
-/* responsive */
-@media (max-width:640px){
-  .links{display:none}
-  .hero h1{font-size:32px}
-  .birthday-row { flex-direction:column; text-align:center }
-  .birthday-avatar { margin-bottom:8px; width:80px; height:80px }
-}
-/* Button */
-.see-anon-btn {
-  background: none;
-  border: none;
-  color: #e91e63;
-  font-weight: bold;
-  text-decoration: underline;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-/* Hidden */
-.hidden {
-  display: none;
-}
-
-/* Card style */
-#anonMessages .card {
-  background: #fff0f6;
-  border-radius: 12px;
-  padding: 15px;
-  margin: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-  max-height: 80px;
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-/* Hidden by default */
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: #fff0f6 url('letter-paper.png') no-repeat center/cover;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-  font-family: 'Poppins', sans-serif;
-  position: relative;
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  font-size: 28px;
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  cursor: pointer;
-  color: #e91e63;
-}
-/* Anonymous Messages Cards */
-#anonMessages .card {
-  background: linear-gradient(120deg, #ffe0f0, #fff0f5); /* Pinkish gradient */
-  border: 2px solid #ff80ab;
-  border-radius: 18px;
-  padding: 16px;
-  margin: 10px 0;
-  box-shadow: 0 8px 18px rgba(255,128,171,0.2);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  color: #6b7280;
-}
-
-#anonMessages .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(255,128,171,0.3);
-  border-color: #ff1493;
-  color: #27272a;
-}
-
-/* Modal Full Message (Pink themed letter paper) */
-.modal-content {
-  background: #fff0f6 url('letter-paper.png') no-repeat center/cover;
-  padding: 24px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 520px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-  font-family: 'Poppins', sans-serif;
-  font-size: 18px;
-  line-height: 1.6;
-  color: #27272a;
-  position: relative;
-  word-break: break-word; /* supports Bangla & English wrap */
-}
-
-.modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: #ff80ab;
-  border-radius: 3px;
-}
-
-body.blurred > *:not(.modal) {
-  filter: blur(6px);
-  pointer-events: none;
+  .birthday-row{flex-direction:column;text-align:center;}
+  .birthday-avatar{margin-bottom:8px;width:80px;height:80px;}
 }
