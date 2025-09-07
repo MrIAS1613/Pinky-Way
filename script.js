@@ -1,7 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwGcTuNZwCZDdwziMkVSPvs2QVJbyA9f_BBCPPV9i0wh5SOH2f_Y2ZE7PaQuDtMFV0Z/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwGcTuNZwziMkVSPvs2QVJbyA9f_BBCPPV9i0wh5SOH2f_Y2ZE7PaQuDtMFV0Z/exec";
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
@@ -17,7 +17,6 @@ function toggleMenu() {
 if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
 if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
 
-// Close overlay if clicked outside menu-content
 if (menuOverlay) {
   menuOverlay.addEventListener("click", (e) => {
     if (e.target === menuOverlay) menuOverlay.style.display = "none";
@@ -171,9 +170,11 @@ async function playBirthdayAudio() {
 // ---------- Anonymous Messages (Google Sheet) ----------
 let anonMessages = [];
 const anonMessagesWrap = document.getElementById("anonMessages");
-const seeAllBtn = document.getElementById("seeAllAnonBtn"); // Button below section
-const anonOverlay = document.getElementById("anonOverlay"); // Full overlay div
-const anonOverlayContent = document.getElementById("anonOverlayContent"); // Inner content div
+const seeAllBtn = document.getElementById("seeAnonBtn");
+const anonMessagesWrapper = document.getElementById("anonMessagesWrapper");
+const messageModal = document.getElementById("messageModal");
+const fullMessageText = document.getElementById("fullMessageText");
+const closeModal = document.getElementById("closeModal");
 
 // Fetch messages from Google Sheet
 async function fetchAnonMessages() {
@@ -188,7 +189,7 @@ async function fetchAnonMessages() {
   }
 }
 
-// Render messages as cards (first 20 lines preview)
+// Render messages as cards (preview first 20 lines)
 function renderAnonMessages() {
   if (!anonMessagesWrap) return;
   anonMessagesWrap.innerHTML = "";
@@ -198,36 +199,67 @@ function renderAnonMessages() {
     card.classList.add("item", "anon-card");
     const preview = msg.message.split("\n").slice(0, 20).join("\n");
     card.innerHTML = `<p>${preview}</p>`;
-    card.addEventListener("click", () => openAnonOverlay(idx));
+    card.addEventListener("click", () => openMessageModal(idx));
     anonMessagesWrap.appendChild(card);
   });
 }
 
-// Open overlay with full message
-function openAnonOverlay(idx) {
-  if (!anonOverlay || !anonOverlayContent) return;
+// Open modal for full message
+function openMessageModal(idx) {
+  if (!messageModal || !fullMessageText) return;
   const msg = anonMessages[idx];
-  anonOverlayContent.innerHTML = `
-    <div style="background:#ffd3e8;padding:20px;border-radius:16px;max-height:80vh;overflow-y:auto;">
-      <p>${msg.message.replace(/\n/g, "<br>")}</p>
+  fullMessageText.innerHTML = `
+    <div style="background:#ffd3e8;padding:20px;border-radius:16px;max-height:80vh;overflow-y:auto;white-space:pre-wrap;">
+      <p>${msg.message}</p>
     </div>
   `;
-  anonOverlay.style.display = "flex";
+  messageModal.classList.remove("hidden");
+  document.body.style.filter = "blur(5px)"; // blur background
 }
 
-// Close overlay
-if (anonOverlay) {
-  anonOverlay.addEventListener("click", (e) => {
-    if (e.target === anonOverlay) anonOverlay.style.display = "none";
+// Close modal
+if (closeModal) {
+  closeModal.addEventListener("click", () => {
+    messageModal.classList.add("hidden");
+    document.body.style.filter = "none";
   });
 }
 
-// "See All Anonymous Messages" button click
+// "See All Anonymous Messages" button
 if (seeAllBtn) {
   seeAllBtn.addEventListener("click", async () => {
-    seeAllBtn.style.display = "none"; // hide button after clicked
+    seeAllBtn.style.display = "none";
+    anonMessagesWrapper.classList.remove("hidden");
     anonMessages = await fetchAnonMessages();
     renderAnonMessages();
+  });
+}
+
+// Handle form submission
+const anonForm = document.getElementById("anonForm");
+if (anonForm) {
+  anonForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("anonName").value.trim() || "Anonymous";
+    const message = document.getElementById("anonWriting").value.trim();
+    if (!message) return alert("Please write a message.");
+
+    try {
+      await fetch(GOOGLE_SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, message })
+      });
+      alert("Message submitted!");
+      anonForm.reset();
+      if (!anonMessagesWrapper.classList.contains("hidden")) {
+        anonMessages = await fetchAnonMessages();
+        renderAnonMessages();
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Failed to submit. Try again.");
+    }
   });
 }
 
