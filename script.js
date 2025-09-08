@@ -10,16 +10,13 @@ const closeMenu = document.getElementById("close-menu");
 
 function toggleMenu() {
   if (!menuOverlay) return;
-  const isVisible = menuOverlay.style.display === "flex";
-  menuOverlay.style.display = isVisible ? "none" : "flex";
+  menuOverlay.style.display = menuOverlay.style.display === "flex" ? "none" : "flex";
 }
 
 if (menuBtn) menuBtn.addEventListener("click", toggleMenu);
 if (closeMenu) closeMenu.addEventListener("click", toggleMenu);
 if (menuOverlay) {
-  menuOverlay.addEventListener("click", (e) => {
-    if (e.target === menuOverlay) menuOverlay.style.display = "none";
-  });
+  menuOverlay.addEventListener("click", e => { if (e.target === menuOverlay) menuOverlay.style.display = "none"; });
 }
 
 // ---------- Helpers ----------
@@ -115,11 +112,9 @@ async function getCount() {
     const members = await loadJSON("/data/members.json");
     const pookies = await loadJSON("/data/pookies.json");
     const total = (members?.length || 0) + (pookies?.length || 0);
-
     const totalCountEl = document.getElementById("totalCount");
     if (totalCountEl) totalCountEl.textContent = total;
-  } catch (err) {
-    console.error("Count error:", err);
+  } catch {
     const totalCountEl = document.getElementById("totalCount");
     if (totalCountEl) totalCountEl.textContent = "Error";
   }
@@ -143,7 +138,6 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
 
   const c = confetti.create(canvas, { resize: true });
   const end = Date.now() + ms;
-
   (function frame() {
     c({ particleCount: 10, spread: 50, startVelocity: 30, origin: { x: 0 } });
     c({ particleCount: 10, spread: 50, startVelocity: 30, origin: { x: 1 } });
@@ -156,7 +150,7 @@ function getBirthdayAudio() { return document.getElementById(BIRTHDAY_AUDIO_ID);
 async function playBirthdayAudio() {
   const audio = getBirthdayAudio();
   if (!audio) return;
-  try { audio.currentTime = 0; await audio.play(); } catch (e) {}
+  try { audio.currentTime = 0; await audio.play(); } catch {}
 }
 
 // ---------- Birthdays ----------
@@ -170,9 +164,7 @@ function nextOccurrence(dob) {
   const d = new Date(dob);
   const today = new Date();
   let next = new Date(today.getFullYear(), d.getMonth(), d.getDate());
-  if (next < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
-    next.setFullYear(today.getFullYear() + 1);
-  }
+  if (next < today) next.setFullYear(today.getFullYear() + 1);
   return next;
 }
 
@@ -192,76 +184,56 @@ async function renderBirthdays() {
     if (!Array.isArray(list)) return;
 
     const todays = list.filter(b => b.dob && isTodayDOB(b.dob));
-    const upcoming = list
-      .filter(b => b.dob && !isTodayDOB(b.dob))
-      .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
-      .sort((a,b)=>a._next-b._next);
+    const upcoming = list.filter(b => b.dob && !isTodayDOB(b.dob))
+                         .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
+                         .sort((a,b) => a._next - b._next);
 
-    if (todays.length===0) {
-      todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
-    } else {
-      todays.forEach(b=>{
-        const msg = b.bio && String(b.bio).trim().length
-          ? b.bio
-          : `Wishing you many many happy returns of the day. We all love you from the heart. You are such a pookie 🎀! <br> - Pinky Way family.`;
+    todayWrap.innerHTML = "";
+    upcomingWrap.innerHTML = "";
 
-        const card = el(`
-          <div class="birthday-row">
-            <div class="birthday-left">
-              <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
-            </div>
-            <div class="birthday-text">
-              <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
-              <b><p style="margin:0 0 6px"><strong>${b.name}</strong></p></b>
-              <p class="birthday-bio" style="margin:0">${msg}</p>
-            </div>
+    if (todays.length === 0) todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
+    else todays.forEach(b => {
+      const msg = b.bio?.trim().length ? b.bio : `Wishing you many many happy returns of the day. We all love you! 🎀`;
+      const card = el(`
+        <div class="birthday-row">
+          <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
+          <div class="birthday-text">
+            <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
+            <p><strong>${b.name}</strong></p>
+            <p class="birthday-bio" style="margin:0">${msg}</p>
           </div>
-        `);
-        todayWrap.appendChild(card);
-        launchCardConfetti(card, CONFETTI_DURATION_MS);
-        if(!birthdayAudioStarted){playBirthdayAudio(); birthdayAudioStarted=true;}
-      });
-    }
+        </div>
+      `);
+      todayWrap.appendChild(card);
+      launchCardConfetti(card, CONFETTI_DURATION_MS);
+      if (!birthdayAudioStarted) { playBirthdayAudio(); birthdayAudioStarted = true; }
+    });
 
     const upcomingLimited = upcoming.slice(0,1);
-    if(upcomingLimited.length===0){
-      upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
-    }else{
-      upcomingLimited.forEach(b=>{
-        const when=formatDayMonth(b._next);
-        upcomingWrap.appendChild(el(`
-          <div class="upcoming-card">
-            <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
-            <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
-          </div>
-        `));
-      });
-    }
-  } catch(err){console.error("Birthday load error:",err);}
+    if (upcomingLimited.length === 0) upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
+    else upcomingLimited.forEach(b => {
+      const when = formatDayMonth(b._next);
+      upcomingWrap.appendChild(el(`
+        <div class="upcoming-card">
+          <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
+          <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
+        </div>
+      `));
+    });
+  } catch(err){ console.error("Birthday load error:", err); }
 }
 
 // ---------- Re-confetti ----------
 function setupReconfettiTriggers(){
-  const section=document.getElementById("birthday-section");
-  if(!section) return;
-  const retrigger=()=>{launchCardConfetti(section,CONFETTI_DURATION_MS);playBirthdayAudio();}
-  ["pointerdown","click","touchstart"].forEach(evt=>{section.addEventListener(evt,retrigger,{passive:true})});
+  const section = document.getElementById("birthday-section");
+  if (!section) return;
+  const retrigger = () => { launchCardConfetti(section, CONFETTI_DURATION_MS); playBirthdayAudio(); }
+  ["pointerdown","click","touchstart"].forEach(evt => section.addEventListener(evt, retrigger, {passive:true}));
 }
 
-// ---------- Init ----------
-window.addEventListener("DOMContentLoaded", async () => {
-  const y=document.getElementById("year"); if(y) y.textContent=new Date().getFullYear();
-
-  const members=await loadJSON("/data/members.json"); renderMembers(members);
-  const pookies=await loadJSON("/data/pookies.json"); renderPookies(pookies);
-  await getCount();
-  await renderBirthdays();
-  setupReconfettiTriggers();
-});
-// ------------------ Anonymous Messages ------------------
+// ---------- Anonymous Messages ----------
 let anonMessages = [];
 
-// Fetch messages from Google Sheets
 async function loadMessages() {
   try {
     const response = await fetch(GOOGLE_SHEET_URL);
@@ -273,13 +245,13 @@ async function loadMessages() {
 
     if (!messages || messages.length === 0) {
       container.innerHTML = "<p class='text-center text-gray-500'>No anonymous messages yet.</p>";
+      anonMessages = [];
       return;
     }
 
     messages.reverse().forEach(msg => {
       const card = document.createElement("div");
       card.className = "bg-white shadow-md rounded-xl p-4 mb-4 cursor-pointer hover:shadow-lg transition";
-
       const preview = msg.writing.length > 100 ? msg.writing.substring(0, 100) + "..." : msg.writing;
       card.innerHTML = `
         <p class="text-gray-700 text-sm">${preview}</p>
@@ -295,7 +267,6 @@ async function loadMessages() {
   }
 }
 
-// Show full message modal
 function showFullMessage(message) {
   const modal = document.createElement("div");
   modal.className = "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50";
@@ -308,23 +279,13 @@ function showFullMessage(message) {
   `;
 
   modal.querySelector("button").addEventListener("click", () => modal.remove());
-  modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
+  modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
 
   document.body.appendChild(modal);
 }
 
-// See All Messages button
-document.getElementById("see-all-btn")?.addEventListener("click", () => {
-  const section = document.getElementById("all-messages-section");
-  if (!section) return;
-  section.classList.toggle("hidden");
-  if (!section.classList.contains("hidden")) {
-    loadMessages();
-  }
-});
-
-// Anonymous Form Submission
-document.getElementById("anonymous-form")?.addEventListener("submit", async function (e) {
+// Submit anonymous message
+document.getElementById("anonymous-form")?.addEventListener("submit", async function(e){
   e.preventDefault();
   const name = document.getElementById("name").value.trim() || "Anonymous";
   const writing = document.getElementById("writing").value.trim();
@@ -338,19 +299,37 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
     const response = await fetch(GOOGLE_SHEET_URL, {
       method: "POST",
       body: JSON.stringify({ name, writing }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }
     });
-
     const result = await response.json();
     if (result.result === "success") {
-      alert("✅ Your message was submitted anonymously!");
+      alert("✅ Your message was submitted anonymously! LOVE YOU");
       document.getElementById("anonymous-form").reset();
-      loadMessages();
+      loadMessages(); // instantly refresh
     } else {
       alert("❌ Failed to submit. Try again.");
     }
-  } catch (error) {
-    console.error("Error:", error);
+  } catch(error) {
+    console.error(error);
     alert("⚠️ Network error. Please try again later.");
   }
+});
+
+// See all anonymous messages
+document.getElementById("see-all-btn")?.addEventListener("click", () => {
+  const section = document.getElementById("all-messages-section");
+  if (!section) return;
+  section.classList.toggle("hidden");
+  if (!section.classList.contains("hidden")) loadMessages();
+});
+
+// ---------- Init ----------
+window.addEventListener("DOMContentLoaded", async () => {
+  const y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+
+  const members = await loadJSON("/data/members.json"); renderMembers(members);
+  const pookies = await loadJSON("/data/pookies.json"); renderPookies(pookies);
+  await getCount();
+  await renderBirthdays();
+  setupReconfettiTriggers();
 });
