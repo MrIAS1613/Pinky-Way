@@ -1,16 +1,17 @@
-export default async function handler(req, res) {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzn8wT-tgQEn3xQn1BJTfpL-B-dDdhw5ZMJQYU3fabNJaScYPXj1lPM-hvKuGJO_A4/exec";
+// messages.js
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzn8wT-tgQEn3xQn1BJTfpL-B-dDdhw5ZMJQYU3fabNJaScYPXj1lPM-hvKuGJO_A4/exec";
 
-  async function safeJson(response) {
-    try {
-      return await response.json();
-    } catch {
-      // যদি JSON parse fail করে, fallback
-      const text = await response.text();
-      try { return JSON.parse(text); } catch { return { result: "success", raw: text }; }
-    }
+// Safely parse JSON, but don't fake success
+async function safeJson(response) {
+  try {
+    return await response.json();
+  } catch {
+    const text = await response.text();
+    try { return JSON.parse(text); } catch { return { error: "Invalid JSON", raw: text }; }
   }
+}
 
+export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
       const response = await fetch(SCRIPT_URL, {
@@ -19,15 +20,26 @@ export default async function handler(req, res) {
         body: JSON.stringify(req.body),
       });
       const data = await safeJson(response);
-      res.status(200).json(data);
+
+      if (response.ok && data.result === "success") {
+        res.status(200).json({ result: "success" });
+      } else {
+        res.status(400).json({ result: "fail", details: data.error || data });
+      }
     } catch (error) {
-      res.status(500).json({ error: "Proxy POST failed", details: error.message });
+      res.status(500).json({ result: "fail", error: "Proxy POST failed", details: error.message });
     }
   } else if (req.method === "GET") {
     try {
       const response = await fetch(SCRIPT_URL);
       const data = await safeJson(response);
-      res.status(200).json(data);
+
+      if (response.ok) {
+        // ensure array returned
+        res.status(200).json(Array.isArray(data) ? data.reverse() : []);
+      } else {
+        res.status(400).json({ error: "Proxy GET failed", details: data });
+      }
     } catch (error) {
       res.status(500).json({ error: "Proxy GET failed", details: error.message });
     }
