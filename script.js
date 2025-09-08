@@ -314,7 +314,6 @@ if (result.result === "success") {
   alert("❌ Failed to submit. Try again.");
 }
 
-    }
   } catch(error) {
     console.error(error);
     alert("⚠️ Network error. Please try again later.");
