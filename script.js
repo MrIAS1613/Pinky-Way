@@ -237,13 +237,14 @@ let anonMessages = [];
 async function loadMessages() {
   try {
     const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
+    console.log("GET /api/messages status:", response.status);
     const messages = await response.json();
 
     const container = document.getElementById("messages-container");
     if (!container) return;
     container.innerHTML = "";
 
-    if (!messages || messages.length === 0) {
+    if (!Array.isArray(messages) || messages.length === 0) {
       container.innerHTML = "<p class='text-center text-gray-500'>No anonymous messages yet.</p>";
       anonMessages = [];
       return;
@@ -304,15 +305,15 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
       body: JSON.stringify({ name, writing }),
       headers: { "Content-Type": "application/json" }
     });
-    const result = await response.json().catch(() => ({ result: "success" }));
+    const result = await response.json().catch(() => ({}));
 
-if (result.result === "success") {
-  alert("✅ Your message was submitted anonymously! LOVE YOU");
-  document.getElementById("anonymous-form").reset();
-  loadMessages(); // instantly refresh
-} else {
-  alert("❌ Failed to submit. Try again.");
-}
+    if (result.result === "success" || Object.keys(result).length === 0) {
+      alert("✅ Your message was submitted anonymously! LOVE YOU");
+      document.getElementById("anonymous-form").reset();
+      loadMessages(); // instantly refresh
+    } else {
+      alert("❌ Failed to submit. Try again.");
+    }
 
   } catch(error) {
     console.error(error);
