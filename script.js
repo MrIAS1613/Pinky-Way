@@ -1,7 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyEN1rDXIdPsnGGGVT3sDrapaIIqDJHLt7D26z3KwctpEXJ_V99VT8BMP2ZqLubPOJq/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"; // replace with your new deploy URL
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
@@ -22,7 +22,7 @@ if (menuOverlay) {
 // ---------- Helpers ----------
 async function loadJSON(path) {
   try {
-    const res = await fetch(path, { cache: "no-store" });
+    const res = await fetch(path, { cache: "no-store", mode: "cors" });
     if (!res.ok) return [];
     return await res.json();
   } catch {
@@ -236,7 +236,7 @@ let anonMessages = [];
 
 async function loadMessages() {
   try {
-    const response = await fetch(GOOGLE_SHEET_URL);
+    const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
     const messages = await response.json();
 
     const container = document.getElementById("messages-container");
@@ -264,6 +264,8 @@ async function loadMessages() {
     anonMessages = messages;
   } catch (error) {
     console.error("Fetch anonymous messages error:", error);
+    const container = document.getElementById("messages-container");
+    if (container) container.innerHTML = "<p class='text-center text-red-500'>Network error. Try again later.</p>";
   }
 }
 
@@ -298,6 +300,7 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
   try {
     const response = await fetch(GOOGLE_SHEET_URL, {
       method: "POST",
+      mode: "cors",
       body: JSON.stringify({ name, writing }),
       headers: { "Content-Type": "application/json" }
     });
