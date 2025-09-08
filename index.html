@@ -34,16 +34,20 @@
 </header>
 
 <main class="shell">
+
+  <!-- Hero Section -->
   <section id="home" class="hero">
     <h1>Hello Cuties!</h1>
     <p class="sub">A pookie community for connection, laughter, and support.</p>
   </section>
 
+  <!-- About Section -->
   <section id="about" class="card">
     <h2>About us</h2>
     <p>We’re a community built on good vibes only. Where pookies, friends, and kind souls gather. No toxicity, no drama! Just connection, laughter, and support for each other. A safe space to be yourself, share love and grow together.</p>
   </section>
 
+  <!-- Birthday Section -->
   <section id="birthday-section">
     <h2>🎉 Birthday Celebrations 🎉</h2>
     <div id="today-birthday" class="birthday-card"></div>
@@ -51,54 +55,54 @@
     <div id="upcoming-birthdays" class="birthday-grid"></div>
   </section>
 
+  <!-- Pookies Count -->
   <section>
     <h1>Our Pookies</h1>
     <p><b>Total Number of Pookies: <span id="totalCount">0</span></b></p>
   </section>
 
+  <!-- Admins Section -->
   <section id="members">
     <h2>Admins <span id="adminCount" class="count-badge"></span></h2>
     <div id="members-grid" class="grid"></div>
   </section>
 
+  <!-- Members Section -->
   <section id="pookies">
     <h2>Members <span id="memberCount" class="count-badge"></span></h2>
     <div id="pookies-grid" class="grid"></div>
   </section>
 
-  <!-- Anonymous Section -->
+  <!-- Anonymous Messages Section -->
   <section id="anonymous-section" class="card">
     <h2>Anonymous Messages</h2>
-    <form id="anonForm">
-      <label>Name</label>
-      <input type="text" id="anonName" placeholder="Name" maxlength="50">
-      <label>Your Writings</label>
-      <textarea id="anonWriting" placeholder="Write something..." maxlength="5000"></textarea>
+
+    <form id="anonymous-form">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Name" maxlength="50">
+
+      <label for="writing">Your Writings</label>
+      <textarea id="writing" placeholder="Write something..." maxlength="5000"></textarea>
+
       <button type="submit">Submit</button>
     </form>
 
-    <button id="seeAnonBtn" class="see-anon-btn">See All Anonymous Messages</button>
+    <button id="see-all-btn" class="text-blue-600 mt-4">See all anonymous messages</button>
 
-    <!-- Hidden container for all messages -->
-    <div id="anonMessagesWrapper" class="hidden">
-      <div id="anonMessages" class="grid"></div>
-    </div>
-
-    <!-- New all messages section -->
     <div id="all-messages-section" class="hidden mt-6">
       <div id="messages-container"></div>
     </div>
-    <button id="see-all-btn" class="text-blue-600 mt-4">See all anonymous messages</button>
   </section>
 
-  <!-- Fullscreen modal for individual messages -->
-  <div id="messageModal" class="modal hidden">
-    <div class="modal-content">
-      <button id="closeModal" class="close-modal">&times;</button>
-      <div id="fullMessageText"></div>
-    </div>
-  </div>
 </main>
+
+<!-- Modal for Full Message -->
+<div id="messageModal" class="modal hidden">
+  <div class="modal-content">
+    <button id="closeModal" class="close-modal">&times;</button>
+    <div id="fullMessageText"></div>
+  </div>
+</div>
 
 <footer class="shell foot">
   <p>© <span id="year"></span> Pinky Way • All rights are reserved •</p>
