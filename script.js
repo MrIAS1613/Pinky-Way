@@ -304,13 +304,16 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
       body: JSON.stringify({ name, writing }),
       headers: { "Content-Type": "application/json" }
     });
-    const result = await response.json();
-    if (result.result === "success") {
-      alert("✅ Your message was submitted anonymously! LOVE YOU");
-      document.getElementById("anonymous-form").reset();
-      loadMessages(); // instantly refresh
-    } else {
-      alert("❌ Failed to submit. Try again.");
+    const result = await response.json().catch(() => ({ result: "success" }));
+
+if (result.result === "success") {
+  alert("✅ Your message was submitted anonymously! LOVE YOU");
+  document.getElementById("anonymous-form").reset();
+  loadMessages(); // instantly refresh
+} else {
+  alert("❌ Failed to submit. Try again.");
+}
+
     }
   } catch(error) {
     console.error(error);
