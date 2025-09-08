@@ -1,7 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
-const GOOGLE_SHEET_URL = "/api/messages";
+const GOOGLE_SHEET_URL = "/api/messages"; // proxy API
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
@@ -209,7 +209,7 @@ async function renderBirthdays() {
       if (!birthdayAudioStarted) { playBirthdayAudio(); birthdayAudioStarted = true; }
     });
 
-    const upcomingLimited = upcoming.slice(0,1);
+    const upcomingLimited = upcoming.slice(0, 1);
     if (upcomingLimited.length === 0) upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
     else upcomingLimited.forEach(b => {
       const when = formatDayMonth(b._next);
@@ -220,15 +220,16 @@ async function renderBirthdays() {
         </div>
       `));
     });
+
   } catch(err){ console.error("Birthday load error:", err); }
-}
+                        }
 
 // ---------- Re-confetti ----------
-function setupReconfettiTriggers(){
+function setupReconfettiTriggers() {
   const section = document.getElementById("birthday-section");
   if (!section) return;
-  const retrigger = () => { launchCardConfetti(section, CONFETTI_DURATION_MS); playBirthdayAudio(); }
-  ["pointerdown","click","touchstart"].forEach(evt => section.addEventListener(evt, retrigger, {passive:true}));
+  const retrigger = () => { launchCardConfetti(section, CONFETTI_DURATION_MS); playBirthdayAudio(); };
+  ["pointerdown", "click", "touchstart"].forEach(evt => section.addEventListener(evt, retrigger, { passive: true }));
 }
 
 // ---------- Anonymous Messages ----------
@@ -237,14 +238,13 @@ let anonMessages = [];
 async function loadMessages() {
   try {
     const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
-    console.log("GET /api/messages status:", response.status);
     const messages = await response.json();
 
     const container = document.getElementById("messages-container");
     if (!container) return;
     container.innerHTML = "";
 
-    if (!Array.isArray(messages) || messages.length === 0) {
+    if (!messages || messages.length === 0) {
       container.innerHTML = "<p class='text-center text-gray-500'>No anonymous messages yet.</p>";
       anonMessages = [];
       return;
@@ -287,16 +287,13 @@ function showFullMessage(message) {
   document.body.appendChild(modal);
 }
 
-// Submit anonymous message
-document.getElementById("anonymous-form")?.addEventListener("submit", async function(e){
+// ---------- Submit anonymous message ----------
+document.getElementById("anonymous-form")?.addEventListener("submit", async function(e) {
   e.preventDefault();
   const name = document.getElementById("name").value.trim() || "Anonymous";
   const writing = document.getElementById("writing").value.trim();
 
-  if (!writing) {
-    alert("Message cannot be empty!");
-    return;
-  }
+  if (!writing) { alert("Message cannot be empty!"); return; }
 
   try {
     const response = await fetch(GOOGLE_SHEET_URL, {
@@ -305,9 +302,9 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
       body: JSON.stringify({ name, writing }),
       headers: { "Content-Type": "application/json" }
     });
-    const result = await response.json().catch(() => ({}));
+    const result = await response.json().catch(() => ({ result: "success" }));
 
-    if (result.result === "success" || Object.keys(result).length === 0) {
+    if (result.result === "success") {
       alert("✅ Your message was submitted anonymously! LOVE YOU");
       document.getElementById("anonymous-form").reset();
       loadMessages(); // instantly refresh
@@ -321,7 +318,7 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
   }
 });
 
-// See all anonymous messages
+// ---------- See all anonymous messages ----------
 document.getElementById("see-all-btn")?.addEventListener("click", () => {
   const section = document.getElementById("all-messages-section");
   if (!section) return;
@@ -338,4 +335,5 @@ window.addEventListener("DOMContentLoaded", async () => {
   await getCount();
   await renderBirthdays();
   setupReconfettiTriggers();
+  loadMessages(); // initial load of anonymous messages
 });
