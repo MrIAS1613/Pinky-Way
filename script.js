@@ -1,7 +1,7 @@
 // ---------- Config ----------
 const CONFETTI_DURATION_MS = 10000; // 10s
 const BIRTHDAY_AUDIO_ID = "birthday-audio";
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby59dQnK7s-DmD__2piLK4_rxP01L0yEmPCKwftwSenwWoFwWOlBzmnK5Dt-EhnPu0/exec";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxDTm1JSUIKuADylwcTpXDdk2FGzCS43zazeRroHcPsm6FqTaYpg678AGUCqDjjpmr6/exec";
 
 // ---------- Menu toggle ----------
 const menuBtn = document.getElementById("menu-btn");
