@@ -12,6 +12,9 @@
   --pookie-badge:#fddde6;
   --pookie-border:#f9c5d1;
   --birthday-bio:#111111;
+
+  --admin-glow:#ff1493;
+  --count-badge-bg:#ffc0cb;
 }
 
 /* General Layout */
@@ -76,6 +79,28 @@ section.card{
 .item p{margin:0;color:var(--muted);font-size:14px;}
 .badge{display:inline-block;font-size:12px;color:#5b2240;background:var(--accent-2);padding:4px 8px;border-radius:999px;margin-top:8px;}
 
+/* Count Badges */
+.count-badge{
+  display:inline-block;
+  background-color: var(--count-badge-bg);
+  color:#000;
+  font-weight:600;
+  font-size:0.9rem;
+  padding:0.2rem 0.5rem;
+  border-radius:0.5rem;
+  margin-left:0.5rem;
+}
+
+/* Admin Card Glow */
+.admin-card{
+  border:2px solid var(--admin-glow);
+  box-shadow:0 0 10px var(--admin-glow);
+  transition: transform 0.2s ease;
+}
+.admin-card:hover{
+  transform: translateY(-3px);
+}
+
 /* Avatar & Row */
 .avatar{width:44px;height:44px;border-radius:999px;object-fit:cover;margin-right:10px;border:2px solid var(--ring);background:#ffe9f1;}
 .row{display:flex;align-items:center;}
@@ -88,46 +113,62 @@ section.card{
   transition: color .2s ease, transform .1s ease;
   text-decoration: none;
   vertical-align: middle;
-  margin-right: 8px; /* spacing between icons */
+  margin-right: 8px;
 }
-
 .social-links a:last-child,
 .socials a:last-child {
-  margin-right: 0; /* no extra space after last icon */
+  margin-right: 0;
 }
-
 .social-links a:hover,
 .socials a:hover {
   color: #ff1493;
   transform: translateY(-1px);
 }
 
-
 /* Buttons */
 .see-anon-btn{background:none;border:none;color:#e91e63;font-weight:bold;text-decoration:underline;cursor:pointer;margin-top:10px;}
+#see-all-btn{margin-top:12px; display:inline-block;}
 
 /* Anonymous Messages Form & Cards */
 #anonymous-section form{display:flex;flex-direction:column;gap:12px;}
 #anonymous-section input,#anonymous-section textarea{padding:8px 12px;font-size:16px;border-radius:12px;border:1px solid var(--border);font-family:inherit;}
 #anonymous-section button{background:var(--accent);color:#fff;border:none;padding:12px 18px;border-radius:12px;cursor:pointer;font-size:16px;}
 #anonymous-section button:hover{background:#ff1493;}
-#anonMessages .card{
+
+/* Messages Card */
+#all-messages-section{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:12px;
+}
+.message-card{
   background: linear-gradient(120deg,#ffe0f0,#fff0f5);
   border:2px solid #ff80ab;
   border-radius:18px;
   padding:16px;
-  margin:10px 0;
   box-shadow:0 8px 18px rgba(255,128,171,0.2);
   cursor:pointer;
   transition:transform 0.15s ease,box-shadow 0.15s ease;
   overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
+  word-wrap:break-word;
   font-family:'Poppins',sans-serif;
   font-size:16px;
   color:#6b7280;
 }
-#anonMessages .card:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,128,171,0.3);border-color:#ff1493;color:#27272a;}
+.message-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 25px rgba(255,128,171,0.3);
+  border-color:#ff1493;
+  color:#27272a;
+}
+.message-card .preview{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+}
 
 /* Modal */
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999;}
