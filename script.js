@@ -120,7 +120,7 @@ async function getCount() {
   }
 }
 
-// ---------- Confetti + Audio ----------
+// ---------- Confetti ----------
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   if (typeof confetti !== "function" || !container) return;
 
@@ -146,6 +146,7 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   })();
 }
 
+// ---------- Birthday Audio ----------
 function getBirthdayAudio() { return document.getElementById(BIRTHDAY_AUDIO_ID); }
 async function playBirthdayAudio() {
   const audio = getBirthdayAudio();
@@ -222,19 +223,11 @@ async function renderBirthdays() {
     });
 
   } catch(err){ console.error("Birthday load error:", err); }
-                        }
-
-// ---------- Re-confetti ----------
-function setupReconfettiTriggers() {
-  const section = document.getElementById("birthday-section");
-  if (!section) return;
-  const retrigger = () => { launchCardConfetti(section, CONFETTI_DURATION_MS); playBirthdayAudio(); };
-  ["pointerdown", "click", "touchstart"].forEach(evt => section.addEventListener(evt, retrigger, { passive: true }));
-}
-
+       }
 // ---------- Anonymous Messages ----------
 let anonMessages = [];
 
+// Load messages from Google Sheet
 async function loadMessages() {
   try {
     const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
@@ -270,6 +263,7 @@ async function loadMessages() {
   }
 }
 
+// Show full message in modal
 function showFullMessage(message) {
   const modal = document.createElement("div");
   modal.className = "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50";
@@ -287,7 +281,7 @@ function showFullMessage(message) {
   document.body.appendChild(modal);
 }
 
-// ---------- Submit anonymous message ----------
+// Submit anonymous message
 document.getElementById("anonymous-form")?.addEventListener("submit", async function(e) {
   e.preventDefault();
   const name = document.getElementById("name").value.trim() || "Anonymous";
@@ -318,22 +312,39 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
   }
 });
 
-// ---------- See all anonymous messages ----------
+// Toggle anonymous messages section
 document.getElementById("see-all-btn")?.addEventListener("click", () => {
   const section = document.getElementById("all-messages-section");
   if (!section) return;
   section.classList.toggle("hidden");
-  if (!section.classList.contains("hidden")) loadMessages();
+
+  if (!section.classList.contains("hidden")) loadMessages(); // load when revealed
 });
 
 // ---------- Init ----------
 window.addEventListener("DOMContentLoaded", async () => {
-  const y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+  // Set current year in footer
+  const y = document.getElementById("year"); 
+  if (y) y.textContent = new Date().getFullYear();
 
-  const members = await loadJSON("/data/members.json"); renderMembers(members);
-  const pookies = await loadJSON("/data/pookies.json"); renderPookies(pookies);
+  // Load members and render
+  const members = await loadJSON("/data/members.json"); 
+  renderMembers(members);
+
+  // Load pookies and render
+  const pookies = await loadJSON("/data/pookies.json"); 
+  renderPookies(pookies);
+
+  // Update total count
   await getCount();
+
+  // Render birthdays
   await renderBirthdays();
+
+  // Setup birthday section re-confetti triggers
   setupReconfettiTriggers();
-  loadMessages(); // initial load of anonymous messages
+
+  // Initially keep anonymous messages section hidden
+  const anonSection = document.getElementById("all-messages-section");
+  if (anonSection) anonSection.classList.add("hidden");
 });
