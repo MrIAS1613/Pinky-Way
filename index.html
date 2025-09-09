@@ -68,30 +68,30 @@
 
   <!-- Anonymous Section -->
   <section id="anonymous-section" class="card">
-  <h2>Anonymous Messages</h2>
-  <form id="anonymous-form">
-    <label>Name</label>
-    <input type="text" id="name" placeholder="Name" maxlength="50">
-    <label>Your Writings</label>
-    <textarea id="writing" placeholder="Write something..." maxlength="5000"></textarea>
-    <button type="submit">Submit</button>
-  </form>
+    <h2>Anonymous Messages</h2>
+    <form id="anonymous-form">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Name" maxlength="50">
+      <label>Your Writings</label>
+      <textarea id="writing" placeholder="Write something..." maxlength="5000"></textarea>
+      <button type="submit">Submit</button>
+    </form>
 
-  <!-- Messages hidden by default -->
-  <div id="all-messages-section" class="hidden mt-6">
-    <div id="messages-container"></div>
-  </div>
+    <!-- Hidden messages section by default -->
+    <div id="all-messages-section" class="hidden mt-6">
+      <div id="messages-container" class="flex flex-col gap-3"></div>
+    </div>
 
-  <button id="see-all-btn" class="text-blue-600 mt-4">
-    See all anonymous messages
-  </button>
+    <button id="see-all-btn" class="text-blue-600 mt-4">
+      See all anonymous messages
+    </button>
   </section>
 
   <!-- Fullscreen modal for individual messages -->
   <div id="messageModal" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-y:auto; max-height:90vh;">
       <button id="closeModal" class="close-modal">&times;</button>
-      <div id="fullMessageText"></div>
+      <div id="fullMessageText" class="whitespace-pre-wrap"></div>
     </div>
   </div>
 </main>
@@ -103,6 +103,6 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 <audio id="birthday-audio" preload="auto" src="birthday.mp3"></audio>
 <script src="script.js" defer></script>
-
+<script src="messages.js" type="module" defer></script>
 </body>
 </html>
