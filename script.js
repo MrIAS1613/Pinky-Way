@@ -119,8 +119,7 @@ async function getCount() {
     if (totalCountEl) totalCountEl.textContent = "Error";
   }
 }
-
-// ---------- Confetti ----------
+// ---------- Confetti + Audio ----------
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   if (typeof confetti !== "function" || !container) return;
 
@@ -146,7 +145,6 @@ function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
   })();
 }
 
-// ---------- Birthday Audio ----------
 function getBirthdayAudio() { return document.getElementById(BIRTHDAY_AUDIO_ID); }
 async function playBirthdayAudio() {
   const audio = getBirthdayAudio();
@@ -194,7 +192,7 @@ async function renderBirthdays() {
 
     if (todays.length === 0) todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     else todays.forEach(b => {
-      const msg = b.bio?.trim().length ? b.bio : `Wishing you many many happy returns of the day. We all love you! 🎀`;
+      const msg = b.bio?.trim().length ? b.bio : `Wishing you many happy returns of the day. We all love you! 🎀`;
       const card = el(`
         <div class="birthday-row">
           <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
@@ -223,11 +221,19 @@ async function renderBirthdays() {
     });
 
   } catch(err){ console.error("Birthday load error:", err); }
-       }
+}
+
+// ---------- Re-confetti ----------
+function setupReconfettiTriggers() {
+  const section = document.getElementById("birthday-section");
+  if (!section) return;
+  const retrigger = () => { launchCardConfetti(section, CONFETTI_DURATION_MS); playBirthdayAudio(); };
+  ["pointerdown", "click", "touchstart"].forEach(evt => section.addEventListener(evt, retrigger, { passive: true }));
+}
+
 // ---------- Anonymous Messages ----------
 let anonMessages = [];
 
-// Load messages from Google Sheet
 async function loadMessages() {
   try {
     const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
@@ -263,15 +269,15 @@ async function loadMessages() {
   }
 }
 
-// Show full message in modal
+// ---------- Full message modal ----------
 function showFullMessage(message) {
   const modal = document.createElement("div");
-  modal.className = "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50";
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 overflow-auto p-4";
 
   modal.innerHTML = `
-    <div class="bg-pink-100 rounded-2xl shadow-xl p-6 max-w-lg w-11/12 relative font-serif">
+    <div class="bg-pink-100 rounded-2xl shadow-xl p-6 max-w-lg w-full relative font-serif">
       <button class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
-      <div class="whitespace-pre-wrap text-gray-800 text-base leading-relaxed">${message}</div>
+      <div class="whitespace-pre-wrap text-gray-800 text-base leading-relaxed max-h-[70vh] overflow-y-auto">${message}</div>
     </div>
   `;
 
@@ -280,8 +286,7 @@ function showFullMessage(message) {
 
   document.body.appendChild(modal);
 }
-
-// Submit anonymous message
+// ---------- Submit anonymous message ----------
 document.getElementById("anonymous-form")?.addEventListener("submit", async function(e) {
   e.preventDefault();
   const name = document.getElementById("name").value.trim() || "Anonymous";
@@ -301,7 +306,8 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
     if (result.result === "success") {
       alert("✅ Your message was submitted anonymously! LOVE YOU");
       document.getElementById("anonymous-form").reset();
-      loadMessages(); // instantly refresh
+      const section = document.getElementById("all-messages-section");
+      if (!section.classList.contains("hidden")) loadMessages(); // refresh only if visible
     } else {
       alert("❌ Failed to submit. Try again.");
     }
@@ -312,39 +318,30 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
   }
 });
 
-// Toggle anonymous messages section
+// ---------- See all anonymous messages toggle ----------
 document.getElementById("see-all-btn")?.addEventListener("click", () => {
   const section = document.getElementById("all-messages-section");
   if (!section) return;
   section.classList.toggle("hidden");
-
-  if (!section.classList.contains("hidden")) loadMessages(); // load when revealed
+  if (!section.classList.contains("hidden")) loadMessages();
 });
 
 // ---------- Init ----------
 window.addEventListener("DOMContentLoaded", async () => {
-  // Set current year in footer
-  const y = document.getElementById("year"); 
-  if (y) y.textContent = new Date().getFullYear();
+  // Current year
+  const y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
 
-  // Load members and render
-  const members = await loadJSON("/data/members.json"); 
-  renderMembers(members);
-
-  // Load pookies and render
-  const pookies = await loadJSON("/data/pookies.json"); 
-  renderPookies(pookies);
-
-  // Update total count
+  // Load members and pookies
+  const members = await loadJSON("/data/members.json"); renderMembers(members);
+  const pookies = await loadJSON("/data/pookies.json"); renderPookies(pookies);
   await getCount();
 
-  // Render birthdays
+  // Birthdays
   await renderBirthdays();
-
-  // Setup birthday section re-confetti triggers
   setupReconfettiTriggers();
 
-  // Initially keep anonymous messages section hidden
+  // Anonymous messages initial load
+  // Only load messages if section is visible
   const anonSection = document.getElementById("all-messages-section");
-  if (anonSection) anonSection.classList.add("hidden");
+  if (!anonSection.classList.contains("hidden")) loadMessages();
 });
