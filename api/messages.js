@@ -1,13 +1,17 @@
 // messages.js
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzn8wT-tgQEn3xQn1BJTfpL-B-dDdhw5ZMJQYU3fabNJaScYPXj1lPM-hvKuGJO_A4/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8QoCR2Nw94DsHNDMlTaQ3zw1ET01LffjGgzUO4fiVBQEcaML10Iq6Uc1DXkpHPtMm/exec";
 
-// Safely parse JSON, but don't fake success
+// Safely parse JSON
 async function safeJson(response) {
   try {
     return await response.json();
   } catch {
     const text = await response.text();
-    try { return JSON.parse(text); } catch { return { error: "Invalid JSON", raw: text }; }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { error: "Invalid JSON", raw: text };
+    }
   }
 }
 
@@ -19,12 +23,13 @@ export default async function handler(req, res) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(req.body),
       });
+
       const data = await safeJson(response);
 
       if (response.ok && data.result === "success") {
         res.status(200).json({ result: "success" });
       } else {
-        res.status(400).json({ result: "fail", details: data.error || data });
+        res.status(400).json({ result: "fail", details: data });
       }
     } catch (error) {
       res.status(500).json({ result: "fail", error: "Proxy POST failed", details: error.message });
@@ -34,9 +39,8 @@ export default async function handler(req, res) {
       const response = await fetch(SCRIPT_URL);
       const data = await safeJson(response);
 
-      if (response.ok) {
-        // ensure array returned
-        res.status(200).json(Array.isArray(data) ? data.reverse() : []);
+      if (response.ok && Array.isArray(data)) {
+        res.status(200).json(data.reverse()); // latest first
       } else {
         res.status(400).json({ error: "Proxy GET failed", details: data });
       }
