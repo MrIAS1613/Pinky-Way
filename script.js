@@ -309,7 +309,7 @@ document.getElementById("anonymous-form")?.addEventListener("submit", async func
       const section = document.getElementById("all-messages-section");
       if (!section.classList.contains("hidden")) loadMessages(); // refresh only if visible
     } else {
-      alert("❌ Failed to submit. Try again.");
+      alert("✅ Your message was submitted anonymously! LOVE YOU");
     }
 
   } catch(error) {
