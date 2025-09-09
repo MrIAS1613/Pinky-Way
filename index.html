@@ -68,24 +68,23 @@
 
   <!-- Anonymous Section -->
   <section id="anonymous-section" class="card">
-    <h2>Anonymous Messages</h2>
-    <form id="anonymous-form">
-      <label>Name</label>
-      <input type="text" id="name" placeholder="Name" maxlength="50">
-      <label>Your Writings</label>
-      <textarea id="writing" placeholder="Write something..." maxlength="5000"></textarea>
-      <button type="submit">Submit</button>
-    </form>
-    
+  <h2>Anonymous Messages</h2>
+  <form id="anonymous-form">
+    <label>Name</label>
+    <input type="text" id="name" placeholder="Name" maxlength="50">
+    <label>Your Writings</label>
+    <textarea id="writing" placeholder="Write something..." maxlength="5000"></textarea>
+    <button type="submit">Submit</button>
+  </form>
 
-    <section id="all-messages-section" class="hidden">
-      <div id="messages-container"></div>
-    </section>
-    
-    <div id="all-messages-section" class="hidden mt-6">
-      <div id="messages-container"></div>
-    </div>
-    <button id="see-all-btn" class="text-blue-600 mt-4">See all anonymous messages</button>
+  <!-- Messages hidden by default -->
+  <div id="all-messages-section" class="hidden mt-6">
+    <div id="messages-container"></div>
+  </div>
+
+  <button id="see-all-btn" class="text-blue-600 mt-4">
+    See all anonymous messages
+  </button>
   </section>
 
   <!-- Fullscreen modal for individual messages -->
