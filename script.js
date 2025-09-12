@@ -192,7 +192,7 @@ async function renderBirthdays() {
 
     if (todays.length === 0) todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     else todays.forEach(b => {
-      const msg = b.bio?.trim().length ? b.bio : `Wishing you many happy returns of the day. We all love you! 🎀`;
+      const msg = b.bio?.trim().length ? b.bio : `Wishing you many many happy returns of the day. You are such a pookie! We all love you! 🎀`;
       const card = el(`
         <div class="birthday-row">
           <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
