@@ -152,23 +152,34 @@ async function playBirthdayAudio() {
   try { audio.currentTime = 0; await audio.play(); } catch {}
 }
 
-// ---------- Birthdays ----------
+// ---------- Birthdays (Bangladesh Time) ----------
+
+// Get current date/time in Bangladesh
+function getBangladeshToday() {
+  const now = new Date();
+  return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }));
+}
+
+// Check if DOB is today in Bangladesh
 function isTodayDOB(dob) {
-  const d = new Date(dob); if (isNaN(d)) return false;
-  const today = new Date();
+  const d = new Date(dob);
+  if (isNaN(d)) return false;
+  const today = getBangladeshToday();
   return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
 }
 
+// Get next occurrence of DOB relative to BD today
 function nextOccurrence(dob) {
   const d = new Date(dob);
-  const today = new Date();
+  const today = getBangladeshToday();
   let next = new Date(today.getFullYear(), d.getMonth(), d.getDate());
   if (next < today) next.setFullYear(today.getFullYear() + 1);
   return next;
 }
 
+// Format date (DD Mon)
 function formatDayMonth(date) {
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 }
 
 let birthdayAudioStarted = false;
@@ -183,46 +194,79 @@ async function renderBirthdays() {
     if (!Array.isArray(list)) return;
 
     const todays = list.filter(b => b.dob && isTodayDOB(b.dob));
-    const upcoming = list.filter(b => b.dob && !isTodayDOB(b.dob))
-                         .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
-                         .sort((a,b) => a._next - b._next);
+    const upcoming = list
+      .filter(b => b.dob && !isTodayDOB(b.dob))
+      .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
+      .sort((a, b) => a._next - b._next);
 
     todayWrap.innerHTML = "";
     upcomingWrap.innerHTML = "";
 
-    if (todays.length === 0) todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
-    else todays.forEach(b => {
-      const msg = b.bio?.trim().length ? b.bio : `Wishing you many happy returns of the day. We all love you! 🎀`;
-      const card = el(`
-        <div class="birthday-row">
-          <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
-          <div class="birthday-text">
-            <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
-            <p><strong>${b.name}</strong></p>
-            <p class="birthday-bio" style="margin:0">${msg}</p>
+    // Today’s birthdays
+    if (todays.length === 0) {
+      todayWrap.appendChild(
+        el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`)
+      );
+    } else {
+      todays.forEach(b => {
+        const msg = b.bio?.trim().length
+          ? b.bio
+          : `Wishing you many happy returns of the day. We all love you! 🎀`;
+        const card = el(`
+          <div class="birthday-row">
+            <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
+            <div class="birthday-text">
+              <h3 style="font-size:28px;margin:0 0 10px">Happy Birthday 🎉</h3>
+              <p><strong>${b.name}</strong></p>
+              <p class="birthday-bio" style="margin:0">${msg}</p>
+            </div>
           </div>
-        </div>
-      `);
-      todayWrap.appendChild(card);
-      launchCardConfetti(card, CONFETTI_DURATION_MS);
-      if (!birthdayAudioStarted) { playBirthdayAudio(); birthdayAudioStarted = true; }
-    });
+        `);
+        todayWrap.appendChild(card);
+        launchCardConfetti(card, CONFETTI_DURATION_MS);
+        if (!birthdayAudioStarted) {
+          playBirthdayAudio();
+          birthdayAudioStarted = true;
+        }
+      });
+    }
 
+    // Upcoming birthday (only next 1 person)
     const upcomingLimited = upcoming.slice(0, 1);
-    if (upcomingLimited.length === 0) upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
-    else upcomingLimited.forEach(b => {
-      const when = formatDayMonth(b._next);
-      upcomingWrap.appendChild(el(`
-        <div class="upcoming-card">
-          <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
-          <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
-        </div>
-      `));
-    });
-
-  } catch(err){ console.error("Birthday load error:", err); }
+    if (upcomingLimited.length === 0) {
+      upcomingWrap.appendChild(
+        el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`)
+      );
+    } else {
+      upcomingLimited.forEach(b => {
+        const when = formatDayMonth(b._next);
+        upcomingWrap.appendChild(
+          el(`
+            <div class="upcoming-card">
+              <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
+              <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
+            </div>
+          `)
+        );
+      });
+    }
+  } catch (err) {
+    console.error("Birthday load error:", err);
+  }
 }
 
+// Auto-refresh birthdays at BD midnight
+function scheduleMidnightRefresh() {
+  const now = getBangladeshToday();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0); // next 12:00 AM BD time
+  const msUntilMidnight = midnight - now;
+
+  setTimeout(() => {
+    renderBirthdays(); // refresh birthdays
+    scheduleMidnightRefresh(); // schedule again
+  }, msUntilMidnight);
+        }
 // ---------- Re-confetti ----------
 function setupReconfettiTriggers() {
   const section = document.getElementById("birthday-section");
@@ -336,9 +380,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   const pookies = await loadJSON("/data/pookies.json"); renderPookies(pookies);
   await getCount();
 
-  // Birthdays
-  await renderBirthdays();
-  setupReconfettiTriggers();
+// Birthdays
+await renderBirthdays();
+scheduleMidnightRefresh();  
+setupReconfettiTriggers();
 
   // Anonymous messages initial load
   // Only load messages if section is visible
