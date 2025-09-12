@@ -118,72 +118,95 @@ async function getCount() {
     const totalCountEl = document.getElementById("totalCount");
     if (totalCountEl) totalCountEl.textContent = "Error";
   }
-}
-// ---------- Confetti + Audio ----------
+        }
+
+// ---------- Part 2: Confetti + Birthday Section (Bangladesh time) ----------
+
+// ---------- Confetti helpers ----------
 function launchCardConfetti(container, ms = CONFETTI_DURATION_MS) {
-  if (typeof confetti !== "function" || !container) return;
+  // keep compatibility with both confetti.create and confetti() APIs
+  if (!container || typeof confetti === "undefined") return;
 
-  const canvas = document.createElement("canvas");
-  Object.assign(canvas.style, {
-    position: "absolute",
-    inset: "0",
-    width: "100%",
-    height: "100%",
-    pointerEvents: "none",
-    zIndex: "10",
-  });
-  if (getComputedStyle(container).position === "static") container.style.position = "relative";
-  container.appendChild(canvas);
+  // if confetti.create exists (canvas mode) use that, else fallback to global confetti
+  if (typeof confetti.create === "function") {
+    const canvas = document.createElement("canvas");
+    Object.assign(canvas.style, {
+      position: "absolute",
+      inset: "0",
+      width: "100%",
+      height: "100%",
+      pointerEvents: "none",
+      zIndex: "10",
+    });
+    if (getComputedStyle(container).position === "static") container.style.position = "relative";
+    container.appendChild(canvas);
 
-  const c = confetti.create(canvas, { resize: true });
+    const c = confetti.create(canvas, { resize: true });
+    const end = Date.now() + ms;
+
+    (function frame() {
+      c({ particleCount: 8, spread: 50, startVelocity: 30, origin: { x: Math.random() } });
+      if (Date.now() < end) requestAnimationFrame(frame);
+      else canvas.remove();
+    })();
+    return;
+  }
+
+  // fallback (global confetti function)
   const end = Date.now() + ms;
   (function frame() {
-    c({ particleCount: 10, spread: 50, startVelocity: 30, origin: { x: 0 } });
-    c({ particleCount: 10, spread: 50, startVelocity: 30, origin: { x: 1 } });
+    confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 } });
+    confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 } });
     if (Date.now() < end) requestAnimationFrame(frame);
-    else canvas.remove();
   })();
 }
 
+// simple wrapper to retrigger confetti on a container
+function triggerConfettiOn(container, ms = CONFETTI_DURATION_MS) {
+  try { launchCardConfetti(container, ms); } catch (e) { /* ignore */ }
+}
+
+// ---------- Audio ----------
 function getBirthdayAudio() { return document.getElementById(BIRTHDAY_AUDIO_ID); }
 async function playBirthdayAudio() {
   const audio = getBirthdayAudio();
   if (!audio) return;
-  try { audio.currentTime = 0; await audio.play(); } catch {}
+  try { audio.currentTime = 0; await audio.play(); } catch (e) { /* autoplay may fail */ }
 }
 
-// ---------- Birthdays (Bangladesh Time) ----------
-
-// Get current date/time in Bangladesh
+// ---------- Bangladesh time helpers ----------
 function getBangladeshToday() {
-  const now = new Date();
-  return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Dhaka" }));
+  // returns a Date object representing now in Asia/Dhaka timezone
+  const nowStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" });
+  return new Date(nowStr);
 }
 
-// Check if DOB is today in Bangladesh
 function isTodayDOB(dob) {
+  // dob can be 'YYYY-MM-DD' or similar — create Date from it
   const d = new Date(dob);
   if (isNaN(d)) return false;
   const today = getBangladeshToday();
   return d.getDate() === today.getDate() && d.getMonth() === today.getMonth();
 }
 
-// Get next occurrence of DOB relative to BD today
 function nextOccurrence(dob) {
   const d = new Date(dob);
   const today = getBangladeshToday();
   let next = new Date(today.getFullYear(), d.getMonth(), d.getDate());
-  if (next < today) next.setFullYear(today.getFullYear() + 1);
+  // compare by date value (midnight local)
+  if (next < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+    next.setFullYear(today.getFullYear() + 1);
+  }
   return next;
 }
 
-// Format date (DD Mon)
 function formatDayMonth(date) {
-  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+  // accept Date or timestamp
+  const dt = (date instanceof Date) ? date : new Date(date);
+  return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
-let birthdayAudioStarted = false;
-
+// ---------- Birthday renderer (uses Bangladesh time) ----------
 async function renderBirthdays() {
   const todayWrap = document.getElementById("today-birthday");
   const upcomingWrap = document.getElementById("upcoming-birthdays");
@@ -191,27 +214,29 @@ async function renderBirthdays() {
 
   try {
     const list = await loadJSON("/data/birthdays.json");
-    if (!Array.isArray(list)) return;
+    if (!Array.isArray(list)) {
+      todayWrap.innerHTML = `<p style="color:#6b7280;margin:0">No birthdays today.</p>`;
+      upcomingWrap.innerHTML = `<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`;
+      return;
+    }
 
+    // filter & compute next occurrences using BD time helpers
     const todays = list.filter(b => b.dob && isTodayDOB(b.dob));
     const upcoming = list
       .filter(b => b.dob && !isTodayDOB(b.dob))
       .map(b => ({ ...b, _next: nextOccurrence(b.dob) }))
       .sort((a, b) => a._next - b._next);
 
+    // clear containers
     todayWrap.innerHTML = "";
     upcomingWrap.innerHTML = "";
 
-    // Today’s birthdays
+    // render todays
     if (todays.length === 0) {
-      todayWrap.appendChild(
-        el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`)
-      );
+      todayWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No birthdays today.</p>`));
     } else {
       todays.forEach(b => {
-        const msg = b.bio?.trim().length
-          ? b.bio
-          : `Wishing you many happy returns of the day. We all love you! 🎀`;
+        const msg = b.bio?.trim().length ? b.bio : `Wishing you many happy returns of the day. We all love you! 🎀`;
         const card = el(`
           <div class="birthday-row">
             <div class="birthday-left"><img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}"></div>
@@ -223,51 +248,57 @@ async function renderBirthdays() {
           </div>
         `);
         todayWrap.appendChild(card);
-        launchCardConfetti(card, CONFETTI_DURATION_MS);
-        if (!birthdayAudioStarted) {
-          playBirthdayAudio();
-          birthdayAudioStarted = true;
-        }
+        // confetti & audio
+        triggerConfettiOn(card, CONFETTI_DURATION_MS);
+        if (!birthdayAudioStarted) { playBirthdayAudio(); birthdayAudioStarted = true; }
       });
     }
 
-    // Upcoming birthday (only next 1 person)
+    // render upcoming (only next 1)
     const upcomingLimited = upcoming.slice(0, 1);
     if (upcomingLimited.length === 0) {
-      upcomingWrap.appendChild(
-        el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`)
-      );
+      upcomingWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`));
     } else {
       upcomingLimited.forEach(b => {
         const when = formatDayMonth(b._next);
-        upcomingWrap.appendChild(
-          el(`
-            <div class="upcoming-card">
-              <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
-              <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
-            </div>
-          `)
-        );
+        upcomingWrap.appendChild(el(`
+          <div class="upcoming-card">
+            <img class="birthday-avatar" src="${b.avatar||''}" alt="${b.name}">
+            <p style="margin:0"><strong>${b.name}</strong><br>${when}</p>
+          </div>
+        `));
       });
     }
   } catch (err) {
     console.error("Birthday load error:", err);
+    todayWrap.innerHTML = `<p style="color:#6b7280;margin:0">No birthdays today.</p>`;
+    upcomingWrap.innerHTML = `<p style="color:#6b7280;margin:0">No upcoming birthdays.</p>`;
   }
 }
 
-// Auto-refresh birthdays at BD midnight
+// ---------- Auto-refresh at Bangladesh midnight ----------
 function scheduleMidnightRefresh() {
-  const now = getBangladeshToday();
-  const midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0); // next 12:00 AM BD time
-  const msUntilMidnight = midnight - now;
+  try {
+    const now = getBangladeshToday();
+    // create BD midnight of next day (setHours(24,0,0,...))
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const msUntilMidnight = midnight.getTime() - now.getTime();
 
-  setTimeout(() => {
-    renderBirthdays(); // refresh birthdays
-    scheduleMidnightRefresh(); // schedule again
-  }, msUntilMidnight);
-        }
-// ---------- Re-confetti ----------
+    // safety: if ms is invalid or negative, fallback to 1 hour
+    const timeout = (msUntilMidnight > 0 && msUntilMidnight < 2147483647) ? msUntilMidnight : 3600000;
+
+    setTimeout(() => {
+      renderBirthdays();
+      scheduleMidnightRefresh();
+    }, timeout);
+  } catch (e) {
+    // fallback: try again in 1 hour
+    setTimeout(() => scheduleMidnightRefresh(), 3600000);
+  }
+}
+
+// ---------- re-confetti trigger for birthday section ----------
 function setupReconfettiTriggers() {
   const section = document.getElementById("birthday-section");
   if (!section) return;
@@ -275,118 +306,117 @@ function setupReconfettiTriggers() {
   ["pointerdown", "click", "touchstart"].forEach(evt => section.addEventListener(evt, retrigger, { passive: true }));
 }
 
-// ---------- Anonymous Messages ----------
-let anonMessages = [];
+// Exported-ish helpers (kept global): renderBirthdays, scheduleMidnightRefresh, setupReconfettiTriggers
+// (Part 3 will call these during init)
+// ---------- Part 3: Anonymous Messages + Init ----------
 
-async function loadMessages() {
+// ---------- Anonymous Messages Renderer ----------
+async function renderAnonymousMessages() {
+  const msgWrap = document.getElementById("messages-container");
+  if (!msgWrap) return;
+
   try {
-    const response = await fetch(GOOGLE_SHEET_URL, { mode: "cors" });
-    const messages = await response.json();
+    const list = await loadJSON("/data/messages.json");
+    msgWrap.innerHTML = "";
 
-    const container = document.getElementById("messages-container");
-    if (!container) return;
-    container.innerHTML = "";
-
-    if (!messages || messages.length === 0) {
-      container.innerHTML = "<p class='text-center text-gray-500'>No anonymous messages yet.</p>";
-      anonMessages = [];
+    if (!Array.isArray(list) || list.length === 0) {
+      msgWrap.appendChild(el(`<p style="color:#6b7280;margin:0">No anonymous messages yet.</p>`));
       return;
     }
 
-    messages.reverse().forEach(msg => {
-      const card = document.createElement("div");
-      card.className = "bg-white shadow-md rounded-xl p-4 mb-4 cursor-pointer hover:shadow-lg transition";
-      const preview = msg.writing.length > 100 ? msg.writing.substring(0, 100) + "..." : msg.writing;
-      card.innerHTML = `
-        <p class="text-gray-700 text-sm">${preview}</p>
-        <p class="text-xs text-gray-400 mt-2">${new Date(msg.timestamp).toLocaleString()}</p>
-      `;
-      card.addEventListener("click", () => showFullMessage(msg.writing));
-      container.appendChild(card);
+    list.slice().reverse().forEach((m, idx) => {
+      const card = el(`
+        <div class="msg-card">
+          <p class="msg-text">${m.text || ""}</p>
+          <span class="msg-meta">${m.date || ""}</span>
+        </div>
+      `);
+      msgWrap.appendChild(card);
     });
-
-    anonMessages = messages;
-  } catch (error) {
-    console.error("Fetch anonymous messages error:", error);
-    const container = document.getElementById("messages-container");
-    if (container) container.innerHTML = "<p class='text-center text-red-500'>Network error. Try again later.</p>";
+  } catch (err) {
+    console.error("Anon msg error:", err);
+    msgWrap.innerHTML = `<p style="color:#ef4444;margin:0">Failed to load messages.</p>`;
   }
 }
 
-// ---------- Full message modal ----------
-function showFullMessage(message) {
-  const modal = document.createElement("div");
-  modal.className = "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 overflow-auto p-4";
-
-  modal.innerHTML = `
-    <div class="bg-pink-100 rounded-2xl shadow-xl p-6 max-w-lg w-full relative font-serif">
-      <button class="absolute top-2 right-3 text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
-      <div class="whitespace-pre-wrap text-gray-800 text-base leading-relaxed max-h-[70vh] overflow-y-auto">${message}</div>
-    </div>
-  `;
-
-  modal.querySelector("button").addEventListener("click", () => modal.remove());
-  modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
-
-  document.body.appendChild(modal);
-}
-// ---------- Submit anonymous message ----------
-document.getElementById("anonymous-form")?.addEventListener("submit", async function(e) {
+// ---------- Submit Message (with modal + loader) ----------
+async function handleMsgSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById("name").value.trim() || "Anonymous";
-  const writing = document.getElementById("writing").value.trim();
+  const form = e.target;
+  const txt = form.querySelector("textarea[name='message']");
+  if (!txt || !txt.value.trim()) return;
 
-  if (!writing) { alert("Message cannot be empty!"); return; }
+  const payload = { text: txt.value.trim(), date: new Date().toLocaleString("en-US", { timeZone: "Asia/Dhaka" }) };
+
+  const btn = form.querySelector("button[type='submit']");
+  if (btn) btn.disabled = true;
+  showLoader();
 
   try {
-    const response = await fetch(GOOGLE_SHEET_URL, {
+    await fetch(SCRIPT_URL, {
       method: "POST",
-      mode: "cors",
-      body: JSON.stringify({ name, writing }),
+      body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" }
     });
-    const result = await response.json().catch(() => ({ result: "success" }));
 
-    if (result.result === "success") {
-      alert("✅ Your message was submitted anonymously! LOVE YOU");
-      document.getElementById("anonymous-form").reset();
-      const section = document.getElementById("all-messages-section");
-      if (!section.classList.contains("hidden")) loadMessages(); // refresh only if visible
-    } else {
-      alert("✅ Your message was submitted anonymously! LOVE YOU");
-    }
+    txt.value = "";
+    hideLoader();
+    showModal("Your anonymous message has been sent ✅");
 
-  } catch(error) {
-    console.error(error);
-    alert("⚠️ Network error. Please try again later.");
+    // reload messages after short delay
+    setTimeout(renderAnonymousMessages, 1000);
+  } catch (err) {
+    console.error("Submit error:", err);
+    hideLoader();
+    showModal("Failed to send message ❌ Please try again.");
+  } finally {
+    if (btn) btn.disabled = false;
   }
-});
+}
 
-// ---------- See all anonymous messages toggle ----------
-document.getElementById("see-all-btn")?.addEventListener("click", () => {
-  const section = document.getElementById("all-messages-section");
-  if (!section) return;
-  section.classList.toggle("hidden");
-  if (!section.classList.contains("hidden")) loadMessages();
-});
+// ---------- Loader + Modal Helpers ----------
+function showLoader() {
+  const ld = document.getElementById("loader");
+  if (ld) ld.style.display = "flex";
+}
+function hideLoader() {
+  const ld = document.getElementById("loader");
+  if (ld) ld.style.display = "none";
+}
+
+function showModal(msg) {
+  const m = document.getElementById("modal");
+  if (!m) return;
+  m.querySelector(".modal-text").textContent = msg;
+  m.style.display = "flex";
+}
+function closeModal() {
+  const m = document.getElementById("modal");
+  if (m) m.style.display = "none";
+}
 
 // ---------- Init ----------
-window.addEventListener("DOMContentLoaded", async () => {
-  // Current year
-  const y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+function initCommunityPage() {
+  // birthdays
+  renderBirthdays();
+  scheduleMidnightRefresh();
+  setupReconfettiTriggers();
 
-  // Load members and pookies
-  const members = await loadJSON("/data/members.json"); renderMembers(members);
-  const pookies = await loadJSON("/data/pookies.json"); renderPookies(pookies);
-  await getCount();
+  // messages
+  renderAnonymousMessages();
+  const form = document.getElementById("anon-form");
+  if (form) form.addEventListener("submit", handleMsgSubmit);
 
-// Birthdays
-await renderBirthdays();
-scheduleMidnightRefresh();  
-setupReconfettiTriggers();
+  // modal close
+  const closeBtn = document.getElementById("modal-close");
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
-  // Anonymous messages initial load
-  // Only load messages if section is visible
-  const anonSection = document.getElementById("all-messages-section");
-  if (!anonSection.classList.contains("hidden")) loadMessages();
-});
+  // one-time audio play trigger (user gesture requirement in browsers)
+  document.body.addEventListener("click", () => {
+    const a = getBirthdayAudio();
+    if (a) { a.play().catch(()=>{}); }
+  }, { once: true });
+}
+
+// ---------- Run ----------
+document.addEventListener("DOMContentLoaded", initCommunityPage);
